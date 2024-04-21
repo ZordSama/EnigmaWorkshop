@@ -1,4 +1,4 @@
-namespace EnigmaWorkshop.Backend
+namespace enigmaworkshop-backend
 {
     public class WeatherForecast
     {

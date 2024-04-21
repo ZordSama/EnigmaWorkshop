@@ -1,0 +1,6 @@
+@enigmaworkshop-backend_HostAddress = http://localhost:5070
+
+GET {{enigmaworkshop-backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

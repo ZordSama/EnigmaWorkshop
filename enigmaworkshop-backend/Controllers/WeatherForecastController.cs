@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace EnigmaWorkshop.Backend.Controllers
+namespace enigmaworkshop-backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
