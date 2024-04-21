@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
+
 export function middleware(request: NextRequest){
     if(request.nextUrl.pathname === '/'){
-        return NextResponse.redirect(new URL('/home', request.url)) //redirects to /home if the path is /
+        // console.log('request', request);
+        return NextResponse.redirect(new URL('/home', request.url))
     }else{
-        return NextResponse.next() //if the path is not /, it will return the next response.
+        // console.log('request', request);
+        return NextResponse.next() 
     }
 }
 
