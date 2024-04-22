@@ -453,3 +453,4 @@ msbuild.log
 msbuild.err
 msbuild.wrn
 /.tmp.driveupload
+/.tmp.drivedownload

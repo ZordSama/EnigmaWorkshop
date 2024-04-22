@@ -19,12 +19,11 @@ import clsx from "clsx";
 
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
-  TwitterIcon,
   GithubIcon,
   DiscordIcon,
-  HeartFilledIcon,
   SearchIcon,
   CartIcon,
+  UserIcon,
 } from "@/components/icons";
 
 import { Logo } from "@/components/icons";
@@ -111,14 +110,12 @@ export const Navbar = () => {
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
           <Button
-            isExternal
             as={Link}
             className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
+            href="/auth"
+            startContent={<UserIcon className="text-default-500" />}
             variant="flat"
-          >
-            Sponsor
+          >Đăng Nhập
           </Button>
         </NavbarItem>
       </NavbarContent>
