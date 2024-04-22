@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IconSvgProps } from "@/types";
-import { LucideProps, ShoppingCart } from "lucide-react";
+import { LucideProps, ShoppingCart, User } from "lucide-react";
 interface IconProps extends Omit<LucideProps, 'ref'> {
   }
 export const CartIcon: React.FC<IconProps> = ({
@@ -9,6 +9,13 @@ export const CartIcon: React.FC<IconProps> = ({
   height,
   ...props
 }) => <ShoppingCart width={size || width} height={size || height} {...props} />;
+
+export const UserIcon: React.FC<IconProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => <User width={size || width} height={size || height} {...props} />;
 
 export const Logo: React.FC<IconSvgProps> = ({
   size = 36,
