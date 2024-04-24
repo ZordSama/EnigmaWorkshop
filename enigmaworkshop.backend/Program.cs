@@ -29,7 +29,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<DataSevices>();
+// builder.Services.AddScoped<DataSevices>();
 builder.Services.AddScoped<JwtServices>();
 
 // Add services to the container.

@@ -14,7 +14,7 @@ public class JwtServices
     {
         _config = config;
     }
-    public string GenerateToken(NgDung user)
+    public string GenerateToken(User user)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
         Claim[]? claims = null;
@@ -26,7 +26,7 @@ public class JwtServices
         var token = new JwtSecurityToken(user.Id, null, claims, expires: DateTime.Now.AddMinutes(15), signingCredentials: creds);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    public NgDung? ValidateToken(string token)
+    public User? ValidateToken(string token)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
         try
@@ -41,7 +41,7 @@ public class JwtServices
             }, out SecurityToken validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
             var userId = jwtToken.Subject;
-            return new NgDung { Id = userId };
+            return new User { Id = userId };
         }
         catch (Exception ex)
         {

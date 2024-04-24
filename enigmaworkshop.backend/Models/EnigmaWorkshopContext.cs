@@ -6,185 +6,180 @@ namespace enigmaworkshop.backend.Models;
 
 public partial class EnigmaWorkshopContext : DbContext
 {
+    public EnigmaWorkshopContext()
+    {
+    }
+
     public EnigmaWorkshopContext(DbContextOptions<EnigmaWorkshopContext> options)
         : base(options)
     {
     }
 
-    public virtual DbSet<DatHang> DatHangs { get; set; }
+    public virtual DbSet<Cart> Carts { get; set; }
 
-    public virtual DbSet<DonHang> DonHangs { get; set; }
+    public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<GioHang> GioHangs { get; set; }
+    public virtual DbSet<Customer> Customers { get; set; }
 
-    public virtual DbSet<KhachHang> KhachHangs { get; set; }
+    public virtual DbSet<Employee> Employees { get; set; }
 
-    public virtual DbSet<LoaiSanPham> LoaiSanPhams { get; set; }
+    public virtual DbSet<OderDetail> OderDetails { get; set; }
 
-    public virtual DbSet<NgDung> NgDungs { get; set; }
+    public virtual DbSet<Order> Orders { get; set; }
 
-    public virtual DbSet<NhanVien> NhanViens { get; set; }
+    public virtual DbSet<Product> Products { get; set; }
 
-    public virtual DbSet<PhanLoai> PhanLoais { get; set; }
+    public virtual DbSet<ProductCategory> ProductCategories { get; set; }
 
-    public virtual DbSet<SanPham> SanPhams { get; set; }
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DatHang>(entity =>
+        modelBuilder.Entity<Cart>(entity =>
         {
             entity
                 .HasNoKey()
-                .ToTable("DatHang");
+                .ToTable("Cart");
 
-            entity.Property(e => e.DonHang).HasMaxLength(255);
-            entity.Property(e => e.SanPham).HasMaxLength(255);
+            entity.Property(e => e.Customer).HasMaxLength(255);
+            entity.Property(e => e.Products).HasMaxLength(255);
 
-            entity.HasOne(d => d.DonHangNavigation).WithMany()
-                .HasForeignKey(d => d.DonHang)
+            entity.HasOne(d => d.CustomerNavigation).WithMany()
+                .HasForeignKey(d => d.Customer)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__DatHang__DonHang__75A278F5");
+                .HasConstraintName("FK__Cart__Customer__2739D489");
 
-            entity.HasOne(d => d.SanPhamNavigation).WithMany()
-                .HasForeignKey(d => d.SanPham)
+            entity.HasOne(d => d.ProductsNavigation).WithMany()
+                .HasForeignKey(d => d.Products)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__DatHang__SanPham__76969D2E");
+                .HasConstraintName("FK__Cart__Products__282DF8C2");
         });
 
-        modelBuilder.Entity<DonHang>(entity =>
+        modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__DonHang__3214EC0773DF7CCD");
-
-            entity.ToTable("DonHang");
+            entity.HasKey(e => e.Id).HasName("PK__Categori__3214EC07FFFB9D73");
 
             entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.ChiTietKhac).HasColumnType("text");
-            entity.Property(e => e.DiaChi).HasMaxLength(255);
-            entity.Property(e => e.KhachHang).HasMaxLength(255);
+            entity.Property(e => e.Name).HasMaxLength(255);
+            entity.Property(e => e.SubOf).HasMaxLength(255);
 
-            entity.HasOne(d => d.KhachHangNavigation).WithMany(p => p.DonHangs)
-                .HasForeignKey(d => d.KhachHang)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__DonHang__KhachHa__74AE54BC");
+            entity.HasOne(d => d.SubOfNavigation).WithMany(p => p.InverseSubOfNavigation)
+                .HasForeignKey(d => d.SubOf)
+                .HasConstraintName("FK__Categorie__SubOf__2B0A656D");
         });
 
-        modelBuilder.Entity<GioHang>(entity =>
+        modelBuilder.Entity<Customer>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Customer__3214EC07914D34D1");
+
+            entity.HasIndex(e => e.User, "UQ__Customer__BD20C6F1C81C634B").IsUnique();
+
+            entity.Property(e => e.Id).HasMaxLength(255);
+            entity.Property(e => e.Address).HasColumnType("text");
+            entity.Property(e => e.FullName).HasMaxLength(255);
+            entity.Property(e => e.User).HasMaxLength(255);
+
+            entity.HasOne(d => d.UserNavigation).WithOne(p => p.Customer)
+                .HasForeignKey<Customer>(d => d.User)
+                .HasConstraintName("FK__Customers__User__2645B050");
+        });
+
+        modelBuilder.Entity<Employee>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Employee__3214EC07EB8375C8");
+
+            entity.ToTable("Employee");
+
+            entity.HasIndex(e => e.User, "UQ__Employee__BD20C6F1A8FAAAC8").IsUnique();
+
+            entity.Property(e => e.Id).HasMaxLength(255);
+            entity.Property(e => e.Address).HasColumnType("text");
+            entity.Property(e => e.FullName).HasMaxLength(255);
+            entity.Property(e => e.User).HasMaxLength(255);
+
+            entity.HasOne(d => d.UserNavigation).WithOne(p => p.Employee)
+                .HasForeignKey<Employee>(d => d.User)
+                .HasConstraintName("FK__Employee__User__25518C17");
+        });
+
+        modelBuilder.Entity<OderDetail>(entity =>
+        {
+            entity.HasNoKey();
+
+            entity.Property(e => e.Oder).HasMaxLength(255);
+            entity.Property(e => e.Product).HasMaxLength(255);
+
+            entity.HasOne(d => d.OderNavigation).WithMany()
+                .HasForeignKey(d => d.Oder)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__OderDetail__Oder__2CF2ADDF");
+
+            entity.HasOne(d => d.ProductNavigation).WithMany()
+                .HasForeignKey(d => d.Product)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__OderDetai__Produ__2DE6D218");
+        });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Orders__3214EC0796F39D5B");
+
+            entity.Property(e => e.Id).HasMaxLength(255);
+            entity.Property(e => e.AdditionalFee).HasColumnName("Additional_fee");
+            entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.Breakdown).HasColumnType("text");
+            entity.Property(e => e.Customer).HasMaxLength(255);
+
+            entity.HasOne(d => d.CustomerNavigation).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.Customer)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Orders__Customer__2BFE89A6");
+        });
+
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Products__3214EC07DEC27877");
+
+            entity.Property(e => e.Id).HasMaxLength(255);
+            entity.Property(e => e.Data).HasColumnType("text");
+            entity.Property(e => e.Des).HasColumnType("text");
+            entity.Property(e => e.Name).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<ProductCategory>(entity =>
         {
             entity
                 .HasNoKey()
-                .ToTable("GioHang");
+                .ToTable("Product_category");
 
-            entity.Property(e => e.KhachHang).HasMaxLength(255);
-            entity.Property(e => e.SanPham).HasMaxLength(255);
+            entity.Property(e => e.Categories).HasMaxLength(255);
+            entity.Property(e => e.Products).HasMaxLength(255);
 
-            entity.HasOne(d => d.KhachHangNavigation).WithMany()
-                .HasForeignKey(d => d.KhachHang)
+            entity.HasOne(d => d.CategoriesNavigation).WithMany()
+                .HasForeignKey(d => d.Categories)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__GioHang__KhachHa__6FE99F9F");
+                .HasConstraintName("FK__Product_c__Categ__29221CFB");
 
-            entity.HasOne(d => d.SanPhamNavigation).WithMany()
-                .HasForeignKey(d => d.SanPham)
+            entity.HasOne(d => d.ProductsNavigation).WithMany()
+                .HasForeignKey(d => d.Products)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__GioHang__SanPham__70DDC3D8");
+                .HasConstraintName("FK__Product_c__Produ__2A164134");
         });
 
-        modelBuilder.Entity<KhachHang>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__KhachHan__3214EC07C7EACA56");
+            entity.HasKey(e => e.Id).HasName("PK__User__3214EC077C134E6A");
 
-            entity.ToTable("KhachHang");
+            entity.ToTable("User");
 
-            entity.HasIndex(e => e.NgDung, "UQ__KhachHan__5018B34E355C0487").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__User__536C85E433C0D29B").IsUnique();
 
             entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.DiaChi).HasColumnType("text");
-            entity.Property(e => e.HoTen).HasMaxLength(255);
-            entity.Property(e => e.NgDung).HasMaxLength(255);
-
-            entity.HasOne(d => d.NgDungNavigation).WithOne(p => p.KhachHang)
-                .HasForeignKey<KhachHang>(d => d.NgDung)
-                .HasConstraintName("FK__KhachHang__NgDun__6EF57B66");
-        });
-
-        modelBuilder.Entity<LoaiSanPham>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__LoaiSanP__3214EC076035E181");
-
-            entity.ToTable("LoaiSanPham");
-
-            entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.TenLoai).HasMaxLength(255);
-            entity.Property(e => e.ThuocLoai).HasMaxLength(255);
-
-            entity.HasOne(d => d.ThuocLoaiNavigation).WithMany(p => p.InverseThuocLoaiNavigation)
-                .HasForeignKey(d => d.ThuocLoai)
-                .HasConstraintName("FK__LoaiSanPh__Thuoc__73BA3083");
-        });
-
-        modelBuilder.Entity<NgDung>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__NgDung__3214EC07BCA0BB9A");
-
-            entity.ToTable("NgDung");
-
-            entity.HasIndex(e => e.TenNgDung, "UQ__NgDung__4992FC4563712CFE").IsUnique();
-
-            entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.MatKhau).HasMaxLength(255);
+            entity.Property(e => e.Password).HasMaxLength(255);
             entity.Property(e => e.Role)
                 .HasDefaultValue(3)
                 .HasColumnName("role");
-            entity.Property(e => e.TenNgDung).HasMaxLength(255);
-        });
-
-        modelBuilder.Entity<NhanVien>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__NhanVien__3214EC07ED6FA91C");
-
-            entity.ToTable("NhanVien");
-
-            entity.HasIndex(e => e.NgDung, "UQ__NhanVien__5018B34E14C34D93").IsUnique();
-
-            entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.DiaChi).HasColumnType("text");
-            entity.Property(e => e.HoTen).HasMaxLength(255);
-            entity.Property(e => e.NgDung).HasMaxLength(255);
-
-            entity.HasOne(d => d.NgDungNavigation).WithOne(p => p.NhanVien)
-                .HasForeignKey<NhanVien>(d => d.NgDung)
-                .HasConstraintName("FK__NhanVien__NgDung__6E01572D");
-        });
-
-        modelBuilder.Entity<PhanLoai>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("PhanLoai");
-
-            entity.Property(e => e.LoaiSanPham).HasMaxLength(255);
-            entity.Property(e => e.SanPham).HasMaxLength(255);
-
-            entity.HasOne(d => d.LoaiSanPhamNavigation).WithMany()
-                .HasForeignKey(d => d.LoaiSanPham)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PhanLoai__LoaiSa__72C60C4A");
-
-            entity.HasOne(d => d.SanPhamNavigation).WithMany()
-                .HasForeignKey(d => d.SanPham)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PhanLoai__SanPha__71D1E811");
-        });
-
-        modelBuilder.Entity<SanPham>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__SanPham__3214EC075CA7BBEE");
-
-            entity.ToTable("SanPham");
-
-            entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.DuLieuKhac).HasColumnType("text");
-            entity.Property(e => e.MoTa).HasMaxLength(1);
-            entity.Property(e => e.TenSanPham).HasMaxLength(255);
+            entity.Property(e => e.Username).HasMaxLength(255);
         });
 
         OnModelCreatingPartial(modelBuilder);
