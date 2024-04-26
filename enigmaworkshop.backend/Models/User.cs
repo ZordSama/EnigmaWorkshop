@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace enigmaworkshop.backend.Models;
 
@@ -9,6 +10,7 @@ public partial class User
 
     public string Username { get; set; } = null!;
 
+    [JsonIgnore]
     public string Password { get; set; } = null!;
 
     public int? Status { get; set; }

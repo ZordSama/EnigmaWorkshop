@@ -6,7 +6,12 @@ using System.Text;
 using enigmaworkshop.backend.Models;
 using Microsoft.IdentityModel.Tokens;
 
-public class JwtServices
+public interface IJwtServices
+{
+    string GenerateToken(User user);
+    string? ValidateToken(string token);
+}
+public class JwtServices :IJwtServices
 {
 
     private IConfiguration _config;
@@ -17,17 +22,17 @@ public class JwtServices
     public string GenerateToken(User user)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-        Claim[]? claims = null;
-        // new[]{
-        //     new Claim(JwtRegisteredClaimNames.Sub, user.TenNgDung),
-        //     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        // };
+        Claim[]? claims = [
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        ];
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(user.Id, null, claims, expires: DateTime.Now.AddMinutes(15), signingCredentials: creds);
+        var token = new JwtSecurityToken(_config["Jwt:Issuer"], null, claims, expires: DateTime.Now.AddDays(1), signingCredentials: creds);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    public User? ValidateToken(string token)
+    public string? ValidateToken(string? token)
     {
+        if (token == null) return null;
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
         try
         {
@@ -36,17 +41,16 @@ public class JwtServices
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = key,
-                ValidateIssuer = false,
+                ValidateIssuer = true,
                 ValidateAudience = false
             }, out SecurityToken validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
-            var userId = jwtToken.Subject;
-            return new User { Id = userId };
+            return jwtToken.Subject;
         }
         catch (Exception ex)
         {
             System.Console.WriteLine(ex.Message);
-            return null; // or handle the exception as appropriate for your application
+            return null;
         }
     }
 }

@@ -1,6 +1,7 @@
+using enigmaworkshop.backend.Authorization;
 using enigmaworkshop.backend.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace enigmaworkshop.backend.Controllers
 {
@@ -11,9 +12,9 @@ namespace enigmaworkshop.backend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly EnigmaWorkshopContext _db;
-        private readonly JwtServices _jwt;
+        private readonly IJwtServices _jwt;
 
-        public AuthController(EnigmaWorkshopContext db, JwtServices jwt)
+        public AuthController(EnigmaWorkshopContext db, IJwtServices jwt)
         {
             _db = db; _jwt = jwt;
         }
@@ -25,17 +26,25 @@ namespace enigmaworkshop.backend.Controllers
         public IActionResult Login(LoginDTO dto)
         {
             var user = _db.Users.FirstOrDefault(u => u.Username == dto.Username);
+
             if (user == null || user.Password != dto.Password) return Unauthorized("Invalid username or password.");
-            return Ok(new { token = _jwt.GenerateToken(user), User });
+            var customer = _db.Customers.FirstOrDefault(c => c.User == user.Id);
+            var employee = _db.Employees.FirstOrDefault(e => e.User == user.Id);
+            return Ok(new { token = _jwt.GenerateToken(user), customer = JsonConvert.SerializeObject(customer), employee = JsonConvert.SerializeObject(employee) });
         }
         [HttpPost("register")]
         [AllowAnonymous]
         public IActionResult Register(RegisterDTO dto)
         {
-            if (_db.Users.FirstOrDefault(u => u.Username == dto.Username) != null) return Conflict("Username already exists.");
+            if (_db.Users.FirstOrDefault(u => u.Username == dto.user.Username) != null) return Conflict("Username already exists.");
             try
             {
-                _db.Users.Add(new User {Id= Guid.NewGuid().ToString(), Username = dto.Username, Password = dto.Password }); _db.SaveChanges();
+                User user = new User { Id = Guid.NewGuid().ToString(), Username = dto.user.Username, Password = dto.user.Password };
+                _db.Users.Add(user);
+                Customer customer = new Customer { Id = Guid.NewGuid().ToString(), User = user.Id, FullName = dto.customer.FullName, Address = dto.customer.Address, DoB = dto.customer.DoB };
+                _db.Customers.Add(customer);
+                //  Email = dto.customer.Email, PhoneNumber = dto.customer.PhoneNumber
+                _db.SaveChanges();
                 return Ok("User registered successfully.");
             }
             catch (Exception ex) { return Problem(title: ex.Message, detail: ex.StackTrace); }

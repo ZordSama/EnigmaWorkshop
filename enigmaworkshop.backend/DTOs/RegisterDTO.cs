@@ -1,5 +1,8 @@
+
+
 public class RegisterDTO
 {
-    public string Username { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public LoginDTO user { get; set; } = null!;
+    public CustomerDTO customer { get; set; } = null!;
+
 }
