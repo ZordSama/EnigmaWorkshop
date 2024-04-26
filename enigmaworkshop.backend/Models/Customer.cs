@@ -11,6 +11,8 @@ public partial class Customer
 
     public string LastName { get; set; } = null!;
 
+    public int Gender { get; set; }
+
     public DateOnly DoB { get; set; }
 
     public string Phone { get; set; } = null!;
