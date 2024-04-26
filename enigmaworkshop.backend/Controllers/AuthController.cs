@@ -41,9 +41,8 @@ namespace enigmaworkshop.backend.Controllers
             {
                 User user = new User { Id = Guid.NewGuid().ToString(), Username = dto.user.Username, Password = dto.user.Password };
                 _db.Users.Add(user);
-                Customer customer = new Customer { Id = Guid.NewGuid().ToString(), User = user.Id, FullName = dto.customer.FullName, Address = dto.customer.Address, DoB = dto.customer.DoB };
+                Customer customer = new Customer { Id = Guid.NewGuid().ToString(), User = user.Id, FirstName = dto.customer.FirstName, LastName = dto.customer.LastName, Address = JsonConvert.SerializeObject(dto.customer.Address), DoB = dto.customer.DoB };
                 _db.Customers.Add(customer);
-                //  Email = dto.customer.Email, PhoneNumber = dto.customer.PhoneNumber
                 _db.SaveChanges();
                 return Ok("User registered successfully.");
             }

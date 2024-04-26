@@ -16,4 +16,6 @@ public partial class Product
     public int? Stock { get; set; }
 
     public string? Data { get; set; }
+
+    public string? Images { get; set; }
 }

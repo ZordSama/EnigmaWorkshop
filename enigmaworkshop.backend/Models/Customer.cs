@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace enigmaworkshop.backend.Models;
 
@@ -12,11 +11,13 @@ public partial class Customer
 
     public string LastName { get; set; } = null!;
 
-    public DateOnly? DoB { get; set; }
+    public DateOnly DoB { get; set; }
 
-    public string? Phone { get; set; }
+    public string Phone { get; set; } = null!;
 
-    public string? Address { get; set; }
+    public string? Email { get; set; }
+
+    public string Address { get; set; } = null!;
 
     public int? Rank { get; set; }
 
@@ -24,6 +25,7 @@ public partial class Customer
 
     public string? User { get; set; }
 
-    [JsonIgnore]
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
     public virtual User? UserNavigation { get; set; }
 }

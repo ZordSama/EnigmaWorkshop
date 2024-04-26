@@ -18,4 +18,6 @@ public partial class Order
     public double? Total { get; set; }
 
     public string? Breakdown { get; set; }
+
+    public virtual Customer CustomerNavigation { get; set; } = null!;
 }
