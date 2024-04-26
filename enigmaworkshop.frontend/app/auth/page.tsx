@@ -1,11 +1,15 @@
 "use client";
 import { Logo } from "@/components/icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LoginForm } from "@/components/forms/authforms";
+import {
+  CustomerForm,
+  LoginForm,
+  RegisterForm,
+} from "@/components/forms/authforms";
 import { AnimatePresence, motion } from "framer-motion";
 
-const LoginBlock = () => {
+function LoginBlock() {
   return (
     <>
       <div className="w-1/2">
@@ -14,56 +18,79 @@ const LoginBlock = () => {
       </div>
     </>
   );
-};
-const RegisterWrapper = () => {
-  return (
-    <>
-      <div>
-        <h1 className="text-3xl font-bold">
-          Chào mừng đến với Enigma Workshop
-        </h1>
-        {/* stepper will sit here */}
-      </div>
-      <div>
-        <RegisterFormStep1 />
-      </div>
-    </>
-  );
-};
-const RegisterFormStep1 = () => {
-  return (
-    <>
-      <form action=""></form>
-    </>
-  );
-};
+}
 
-const tabs = [
-  { label: "loginTab", component: LoginBlock },
-  { label: "registerTab", component: RegisterWrapper },
-];
+function RegisterWrapper() {
+  // local storage watcher
+
+  const [stepNumValue, setStepNumValue] = useState(
+    window.localStorage.getItem("stepNum"),
+  );
+  
+  useEffect(() => {
+    const handleStorage = () => {
+      const newValue = window.localStorage.getItem("stepNum");
+      setStepNumValue(newValue);
+      console.log("New value:", newValue);
+    };
+
+    window.onstorage = () => {
+      handleStorage();
+    };
+
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  // const RegisterFormStep1 = () => {
+  //   return <RegisterForm />;
+  // };
+  // const RegisterFormStep2 = () => {};
+
+  return (
+    <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -10, opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex h-5/6 w-full flex-col items-center justify-between"
+        >
+          <div>
+            <h1 className="text-3xl font-bold">
+              Chào mừng đến với Enigma Workshop
+            </h1>
+            <span>placeholder for stepper</span>
+          </div>
+          <div className="w-1/2">
+            {stepNumValue ? <CustomerForm /> : <RegisterForm />}
+          </div>
+          <div></div>
+        </motion.div>
+      </AnimatePresence>
+    </>
+  );
+}
 
 export default function Auth() {
-  const [selectedTab, setSelectedTab] = useState(tabs[0]);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [visible, setVisible] = useState(true);
   const visibleToggle = () => {
-    setVisible(false);
-    setSelectedTab(tabs[1]);
+    setVisible(!visible);
+    setSelectedTab(1);
   };
   return (
     <div className="flex h-full w-full flex-row place-content-evenly">
-      <div className="flex h-full w-1/2 flex-col justify-center items-center bg-gradient-to-r from-gray-900 to-gray-600 text-default-200">
+      <div className="flex h-full w-1/2 flex-col items-center justify-center bg-gradient-to-r from-gray-900 to-gray-600 text-default-200">
         <AnimatePresence mode="wait">
           <motion.div
-            key={selectedTab ? selectedTab.label : "empty"}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex h-5/6 w-full flex-col justify-between items-center"
+            className="flex h-5/6 w-full flex-col items-center justify-between"
           >
-            <div></div>
-            {selectedTab ? selectedTab.component() : tabs[0].component()}
+            {visible ? <div></div> : null}
+            {selectedTab === 0 ? <LoginBlock /> : <RegisterWrapper />}
             {visible ? (
               <div className="mt-3">
                 Chưa phải là một <span>Enigma</span>?{" "}
@@ -79,6 +106,7 @@ export default function Auth() {
           </motion.div>
         </AnimatePresence>
       </div>
+      {/* R */}
       <div className="relative h-full w-1/2">
         <img
           src="/img/auth/bg-mecha-1.jpg"
