@@ -1,13 +1,83 @@
+"use client";
 import { Logo } from "@/components/icons";
-import React from "react";
-import { Input } from "@nextui-org/input";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { LoginForm } from "@/components/forms/authforms";
+import { AnimatePresence, motion } from "framer-motion";
+
+const LoginBlock = () => {
+  return (
+    <>
+      <div className="w-1/2">
+        <h1 className="text-3xl font-bold">Chào mừng quay trở lại, Enigma</h1>
+        <LoginForm />
+      </div>
+    </>
+  );
+};
+const RegisterWrapper = () => {
+  return (
+    <>
+      <div>
+        <h1 className="text-3xl font-bold">
+          Chào mừng đến với Enigma Workshop
+        </h1>
+        {/* stepper will sit here */}
+      </div>
+      <div>
+        <RegisterFormStep1 />
+      </div>
+    </>
+  );
+};
+const RegisterFormStep1 = () => {
+  return (
+    <>
+      <form action=""></form>
+    </>
+  );
+};
+
+const tabs = [
+  { label: "loginTab", component: LoginBlock },
+  { label: "registerTab", component: RegisterWrapper },
+];
+
 export default function Auth() {
+  const [selectedTab, setSelectedTab] = useState(tabs[0]);
+  const [visible, setVisible] = useState(true);
+  const visibleToggle = () => {
+    setVisible(false);
+    setSelectedTab(tabs[1]);
+  };
   return (
     <div className="flex h-full w-full flex-row place-content-evenly">
-      <div className="flex h-full w-1/2 flex-col place-content-center items-center bg-gradient-to-r from-gray-900 to-gray-600 text-default-200">
-        {/* <LoginForm /> */}
-        <RegisterWrapper />
+      <div className="flex h-full w-1/2 flex-col justify-center items-center bg-gradient-to-r from-gray-900 to-gray-600 text-default-200">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedTab ? selectedTab.label : "empty"}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -10, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex h-5/6 w-full flex-col justify-between items-center"
+          >
+            <div></div>
+            {selectedTab ? selectedTab.component() : tabs[0].component()}
+            {visible ? (
+              <div className="mt-3">
+                Chưa phải là một <span>Enigma</span>?{" "}
+                <Button
+                  variant={"link"}
+                  onClick={visibleToggle}
+                  className="ps-1 text-base text-default"
+                >
+                  Đăng ký
+                </Button>
+              </div>
+            ) : null}
+          </motion.div>
+        </AnimatePresence>
       </div>
       <div className="relative h-full w-1/2">
         <img
@@ -28,64 +98,3 @@ export default function Auth() {
     </div>
   );
 }
-
-const LoginForm = () => {
-  return (
-    <>
-      <h1 className="text-3xl font-bold">Chào mừng quay trở lại, Enigma</h1>
-      <form
-        action="/api/auth/login"
-        method="post"
-        className="mt-8 w-full max-w-md space-y-6"
-      >
-        <Input
-          type="text"
-          label="Tên tài khoản/Email"
-          classNames={{
-            label: "text-black",
-            inputWrapper: "bg-default-400",
-            input: "text-sm",
-          }}
-        />
-        <Input
-          type="password"
-          label="Mật khẩu"
-          classNames={{
-            label: "text-black",
-            inputWrapper: "bg-default-400",
-            input: "text-sm",
-          }}
-        />
-        <Button
-          size="lg"
-          className="h-14 w-full rounded-lg bg-default-700 hover:bg-default-400"
-        >
-          Đăng nhập
-        </Button>
-        <div className="w-full text-end">
-          Chưa có tài khoản?{" "}
-          <Button variant="link" className="ps-0 text-default-200">
-            Đăng ký
-          </Button>
-        </div>
-      </form>
-    </>
-  );
-};
-const RegisterWrapper = () => {
-  return (
-    <>
-      <h1 className="text-3xl font-bold">Chào mừng đến với Enigma Workshop</h1>
-      <RegisterFormStep1/>
-    </>
-  );
-};
-const RegisterFormStep1 = () => {
-  return (
-    <>
-    <form action="" >
-
-    </form>
-    </>
-  );
-};
