@@ -11,7 +11,11 @@ public class AuthMiddleware
 
     public async Task Invoke(HttpContext context, EnigmaWorkshopContext db, IJwtServices jwt)
     {
-        string? token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        string? token = context
+            .Request.Headers["Authorization"]
+            .FirstOrDefault()
+            ?.Split(" ")
+            .Last();
 
         string? userId = null;
         if (token != null)

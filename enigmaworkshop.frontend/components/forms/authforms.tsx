@@ -13,16 +13,29 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { getDistricts, getProvinces, getWards } from "vietnam-provinces";
+import {
+  getDistricts,
+  getProvinces,
+  getProvincesWithDetail,
+  getWards,
+} from "vietnam-provinces";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Calendar } from "../ui/customCalendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
+import { SetStateAction, useState } from "react";
+import axios from "axios";
+import { siteConfig } from "@/config/site";
+import { useRouter } from "next/navigation";
 
 const eMsg = {
   excessLimit: "Vượt quá giới hạn ký tự (255).",
@@ -87,15 +100,12 @@ const customerSchema = z.object({
   gender: z.string().refine((value) => value != "", "phải chọn ở mục này"),
 
   dob: z
-    .string()
+    .date({
+      required_error: "ngày sinh là bắt buộc",
+    })
     .refine(
-      (value) =>
-        /(?:(?:(?:0?[13578]|1[02])(\/|-|\.)31)\1|(?:(?:0?[1,3-9]|1[0-2])(\/|-|\.)(?:29|30)\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:0?2(\/|-|\.)29\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:(?:0?[1-9])|(?:1[0-2]))(\/|-|\.)(?:0?[1-9]|1\d|2[0-8])\4(?:(?:1[6-9]|[2-9]\d)?\d{2})/.test(
-          value,
-        ),
-      {
-        message: "Ngày sinh không đúng định dạng",
-      },
+      (value) => new Date().getFullYear() - value.getFullYear() >= 13,
+      "Bạn phải từ đủ 13 tuổi để tạo tài khoản",
     ),
 
   phone: z
@@ -119,52 +129,6 @@ const customerSchema = z.object({
   province: z.string().trim().min(1, eMsg.isEmpty),
 });
 
-const UserFields = ({ currentForm }: { currentForm: any | undefined }) => {
-  return (
-    <>
-      <FormField
-        control={currentForm.control}
-        name="username"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Tên người dùng</FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Tên người dùng"
-                {...field}
-                style={{ color: "slategray", fontWeight: "bold" }}
-              />
-            </FormControl>
-            <FormDescription>
-              Tên đăng nhập và hiển thị của bạn trong EnigmaWorkshop
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={currentForm.control}
-        name="password"
-        render={({ field }) => (
-          <FormItem className="mt-3">
-            <FormLabel>Mật khẩu</FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Mật khẩu"
-                type="password"
-                {...field}
-                style={{ color: "slategray", fontWeight: "bold" }}
-              />
-            </FormControl>
-            <FormDescription>Mật khẩu sử dụng khi dăng nhập</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </>
-  );
-};
 export function LoginForm() {
   const loginForm = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -176,7 +140,46 @@ export function LoginForm() {
   return (
     <Form {...loginForm}>
       <form onSubmit={loginForm.handleSubmit(onSubmit)} className="mt-5">
-        <UserFields currentForm={loginForm} />
+        <FormField
+          control={loginForm.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tên người dùng</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Tên người dùng"
+                  {...field}
+                  style={{ color: "slategray", fontWeight: "bold" }}
+                />
+              </FormControl>
+              <FormDescription>
+                Tên đăng nhập và hiển thị của bạn trong EnigmaWorkshop
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={loginForm.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="mt-3">
+              <FormLabel>Mật khẩu</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Mật khẩu"
+                  type="password"
+                  {...field}
+                  style={{ color: "slategray", fontWeight: "bold" }}
+                />
+              </FormControl>
+              <FormDescription>Mật khẩu sử dụng khi dăng nhập</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button
           className="mt-5 h-12 w-full"
           variant={"secondary"}
@@ -194,9 +197,26 @@ export function RegisterForm() {
     resolver: zodResolver(registerSchema),
     defaultValues: { username: "", password: "", confirmPassword: "" },
   });
-  function onSubmit(values: z.infer<typeof registerSchema>) {
+  const thisUserExist = async (username: string) => {
+    const resp = await axios.get(
+      siteConfig.api + "Auth/check-username/" + username,
+    );
+    return resp.data;
+  };
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
     console.log(values);
-    window.localStorage.setItem("userReg", JSON.stringify(values, null, 4));
+    if (await thisUserExist(values.username)) {
+      registerForm.setError("username", {
+        type: "custom",
+        message: "Tên người dùng đã được sử dụng!",
+      });
+      return;
+    }
+    const user = {
+      username: values.username,
+      password: values.password,
+    };
+    window.localStorage.setItem("userRegData", JSON.stringify(user, null, 4));
     window.localStorage.setItem("stepNum", "1");
     window.dispatchEvent(new Event("storage"));
   }
@@ -206,7 +226,46 @@ export function RegisterForm() {
         onSubmit={registerForm.handleSubmit(onSubmit)}
         className="mt-5 w-1/2"
       >
-        <UserFields currentForm={registerForm} />
+        <FormField
+          control={registerForm.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tên người dùng</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Tên người dùng"
+                  {...field}
+                  style={{ color: "slategray", fontWeight: "bold" }}
+                />
+              </FormControl>
+              <FormDescription>
+                Tên đăng nhập và hiển thị của bạn trong EnigmaWorkshop
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={registerForm.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="mt-3">
+              <FormLabel>Mật khẩu</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Mật khẩu"
+                  type="password"
+                  {...field}
+                  style={{ color: "slategray", fontWeight: "bold" }}
+                />
+              </FormControl>
+              <FormDescription>Mật khẩu sử dụng khi dăng nhập</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={registerForm.control}
           name="confirmPassword"
@@ -247,7 +306,7 @@ export function CustomerForm() {
       firstName: "",
       lastName: "",
       gender: "",
-      dob: "",
+      dob: new Date(),
       phone: "",
       email: "",
       street: "",
@@ -256,17 +315,77 @@ export function CustomerForm() {
       province: "",
     },
   });
-  function onSubmit(values: z.infer<typeof customerSchema>) {
+  const [selectedProvinceCode, setSelectedProvinceCode] = useState("");
+  const [selectedDistrictCode, setSelectedDistrictCode] = useState("");
+
+  const handleProvinceChange = (selectedCode: SetStateAction<string>) => {
+    setSelectedProvinceCode(selectedCode);
+  };
+
+  const handleDistrictChange = (selectedCode: SetStateAction<string>) => {
+    setSelectedDistrictCode(selectedCode);
+  };
+
+  const getDistrictItems = () => {
+    const districtItems = getDistricts(selectedProvinceCode);
+
+    return districtItems.map((item) => (
+      <SelectItem value={item.code} key={item.code}>
+        {item.name}
+      </SelectItem>
+    ));
+  };
+
+  const getWardItems = () => {
+    const wardItems = getWards(selectedDistrictCode);
+
+    return wardItems.map((item) => (
+      <SelectItem value={item.code} key={item.code}>
+        {item.name}
+      </SelectItem>
+    ));
+  };
+
+  async function onSubmit(values: z.infer<typeof customerSchema>) {
     const req = {
-      user: JSON.parse(window.localStorage.getItem("userReg") || "{}"),
-      customer: values,
+      user: JSON.parse(window.localStorage.getItem("userRegData") || "{}"),
+      customer: {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        gender: values.gender,
+        dob: values.dob,
+        phone: values.phone,
+        email: values.email,
+        address: {
+          street: values.street,
+          ward: values.ward,
+          district: values.district,
+          province: values.province,
+          formatedAddress: `${values.street}, ${values.ward} - ${values.district} - ${values.province}`,
+        },
+      },
     };
+    if (Object.keys(req.user).length === 0)
+      return alert("Trình duyệt của bạn không đáp ứng y/c bảo mật để đăng ký");
+    const resp = await axios.post(siteConfig.api + "Auth/register", req);
+    if (resp.status === 200) {
+      window.localStorage.removeItem("userRegData");
+      window.localStorage.removeItem("stepNum");
+      window.dispatchEvent(new Event("storage"));
+      const login = await axios.post(siteConfig.api + "Auth/login", req.user);
+      if (login.status === 200) {
+        sessionStorage.setItem("token", login.data.token);
+        sessionStorage.setItem("user", JSON.stringify(login.data.user));
+        const router = useRouter();
+        router.push("/home");
+      }
+    }
   }
   return (
     <Form {...customerForm}>
       <form
         onSubmit={customerForm.handleSubmit(onSubmit)}
-        className="mt-5 flex flex-col"
+        className="mt-5 flex w-2/3 flex-col"
       >
         <div className="flex flex-row gap-5">
           <FormField
@@ -277,7 +396,7 @@ export function CustomerForm() {
                 <FormLabel>Họ</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Họ"
+                    placeholder="Atreides"
                     {...field}
                     style={{ color: "slategray", fontWeight: "bold" }}
                   />
@@ -294,7 +413,7 @@ export function CustomerForm() {
                 <FormLabel>Tên</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Tên"
+                    placeholder="Paul Muad'dib"
                     {...field}
                     style={{ color: "slategray", fontWeight: "bold" }}
                   />
@@ -309,14 +428,14 @@ export function CustomerForm() {
             control={customerForm.control}
             name="gender"
             render={({ field }) => (
-              <FormItem
-                style={{ color: "slategray", fontWeight: "bold" }}
-                className="mt-3 w-1/2"
-              >
-                <FormLabel className="text-white">Giới tính</FormLabel>
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Giới tính</FormLabel>
                 <FormControl>
                   <Select onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger
+                      style={{ color: "slategray", fontWeight: "bold" }}
+                      className="w-full"
+                    >
                       <SelectValue {...field} placeholder="Chọn giới tính" />
                     </SelectTrigger>
                     <SelectContent>
@@ -337,11 +456,190 @@ export function CustomerForm() {
             name="dob"
             render={({ field }) => (
               <FormItem className="mt-3 w-1/2">
-                <FormLabel>Tên</FormLabel>
+                <FormLabel className="mb-1">Ngày sinh</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        style={{ color: "slategray", fontWeight: "bold" }}
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-bold",
+                          !field.value && "text-muted-foreground",
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "dd/MM/yyyy")
+                        ) : (
+                          <span>Chọn ngày sinh</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      captionLayout="dropdown-buttons"
+                      fromYear={1900}
+                      toYear={2024}
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex flex-row gap-5">
+          <FormField
+            control={customerForm.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Số điện thoại</FormLabel>
                 <FormControl>
                   <Input
+                    placeholder="0366677788"
                     {...field}
-                    className="hidden"
+                    style={{ color: "slategray", fontWeight: "bold" }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={customerForm.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Paul@Atreides.com"
+                    {...field}
+                    style={{ color: "slategray", fontWeight: "bold" }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <h1 className="mx-auto mt-5 font-semibold">
+          Giới thiệu về bản thân bạn đi nào
+        </h1>
+        <hr className="mx-auto mt-1 w-1/2" />
+        <div className="flex flex-row gap-5">
+          <FormField
+            control={customerForm.control}
+            name="province"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Tỉnh thành</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      handleProvinceChange(value);
+                    }}
+                  >
+                    <SelectTrigger
+                      style={{ color: "slategray", fontWeight: "bold" }}
+                      className="w-full"
+                    >
+                      <SelectValue {...field} placeholder="Chọn tỉnh thành" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {getProvinces().map((province) => (
+                          <SelectItem key={province.code} value={province.code}>
+                            {province.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={customerForm.control}
+            name="district"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Quận huyện / Thị xã / Thành phố</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      handleDistrictChange(value);
+                    }}
+                  >
+                    <SelectTrigger
+                      style={{ color: "slategray", fontWeight: "bold" }}
+                      className="w-full"
+                    >
+                      <SelectValue {...field} placeholder="Chọn Quận/Huyện" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {selectedProvinceCode && getDistrictItems()}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex flex-row gap-5">
+          <FormField
+            control={customerForm.control}
+            name="ward"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Phường</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange}>
+                    <SelectTrigger
+                      style={{ color: "slategray", fontWeight: "bold" }}
+                      className="w-full"
+                    >
+                      <SelectValue {...field} placeholder="Chọn Phường/Xã" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {selectedDistrictCode && getWardItems()}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={customerForm.control}
+            name="street"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Số nhà, tên đường</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Số 22 đường abc"
+                    {...field}
+                    style={{ color: "slategray", fontWeight: "bold" }}
                   />
                 </FormControl>
                 <FormMessage />

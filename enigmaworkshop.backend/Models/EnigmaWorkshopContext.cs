@@ -6,14 +6,10 @@ namespace enigmaworkshop.backend.Models;
 
 public partial class EnigmaWorkshopContext : DbContext
 {
-    public EnigmaWorkshopContext()
-    {
-    }
+    public EnigmaWorkshopContext() { }
 
     public EnigmaWorkshopContext(DbContextOptions<EnigmaWorkshopContext> options)
-        : base(options)
-    {
-    }
+        : base(options) { }
 
     public virtual DbSet<Cart> Carts { get; set; }
 
@@ -33,23 +29,24 @@ public partial class EnigmaWorkshopContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Cart>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Cart");
+            entity.HasNoKey().ToTable("Cart");
 
             entity.Property(e => e.Customer).HasMaxLength(255);
             entity.Property(e => e.Products).HasMaxLength(255);
 
-            entity.HasOne(d => d.CustomerNavigation).WithMany()
+            entity
+                .HasOne(d => d.CustomerNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.Customer)
                 .HasConstraintName("FK__Cart__Customer__4B0D20AB");
 
-            entity.HasOne(d => d.ProductsNavigation).WithMany()
+            entity
+                .HasOne(d => d.ProductsNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.Products)
                 .HasConstraintName("FK__Cart__Products__4C0144E4");
         });
@@ -62,7 +59,9 @@ public partial class EnigmaWorkshopContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.SubOf).HasMaxLength(255);
 
-            entity.HasOne(d => d.SubOfNavigation).WithMany(p => p.InverseSubOfNavigation)
+            entity
+                .HasOne(d => d.SubOfNavigation)
+                .WithMany(p => p.InverseSubOfNavigation)
                 .HasForeignKey(d => d.SubOf)
                 .HasConstraintName("FK__Categorie__SubOf__4EDDB18F");
         });
@@ -74,14 +73,16 @@ public partial class EnigmaWorkshopContext : DbContext
             entity.HasIndex(e => e.User, "UQ__Customer__BD20C6F1C798F498").IsUnique();
 
             entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.Address).HasColumnType("text");
+            entity.Property(e => e.Address).HasColumnType("ntext");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.FirstName).HasMaxLength(255);
             entity.Property(e => e.LastName).HasMaxLength(255);
             entity.Property(e => e.Phone).HasMaxLength(255);
             entity.Property(e => e.User).HasMaxLength(255);
 
-            entity.HasOne(d => d.UserNavigation).WithOne(p => p.Customer)
+            entity
+                .HasOne(d => d.UserNavigation)
+                .WithOne(p => p.Customer)
                 .HasForeignKey<Customer>(d => d.User)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK__Customers__User__4A18FC72");
@@ -96,14 +97,16 @@ public partial class EnigmaWorkshopContext : DbContext
             entity.HasIndex(e => e.User, "UQ__Employee__BD20C6F153E9EFF6").IsUnique();
 
             entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.Address).HasColumnType("text");
+            entity.Property(e => e.Address).HasColumnType("ntext");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.FirstName).HasMaxLength(255);
             entity.Property(e => e.LastName).HasMaxLength(255);
             entity.Property(e => e.Phone).HasMaxLength(255);
             entity.Property(e => e.User).HasMaxLength(255);
 
-            entity.HasOne(d => d.UserNavigation).WithOne(p => p.Employee)
+            entity
+                .HasOne(d => d.UserNavigation)
+                .WithOne(p => p.Employee)
                 .HasForeignKey<Employee>(d => d.User)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK__Employee__User__4924D839");
@@ -116,11 +119,15 @@ public partial class EnigmaWorkshopContext : DbContext
             entity.Property(e => e.Oder).HasMaxLength(255);
             entity.Property(e => e.Product).HasMaxLength(255);
 
-            entity.HasOne(d => d.OderNavigation).WithMany()
+            entity
+                .HasOne(d => d.OderNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.Oder)
                 .HasConstraintName("FK__OderDetail__Oder__50C5FA01");
 
-            entity.HasOne(d => d.ProductNavigation).WithMany()
+            entity
+                .HasOne(d => d.ProductNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.Product)
                 .HasConstraintName("FK__OderDetai__Produ__51BA1E3A");
         });
@@ -132,10 +139,12 @@ public partial class EnigmaWorkshopContext : DbContext
             entity.Property(e => e.Id).HasMaxLength(255);
             entity.Property(e => e.AdditionalFee).HasColumnName("Additional_fee");
             entity.Property(e => e.Address).HasMaxLength(255);
-            entity.Property(e => e.Breakdown).HasColumnType("text");
+            entity.Property(e => e.Breakdown).HasColumnType("ntext");
             entity.Property(e => e.Customer).HasMaxLength(255);
 
-            entity.HasOne(d => d.CustomerNavigation).WithMany(p => p.Orders)
+            entity
+                .HasOne(d => d.CustomerNavigation)
+                .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.Customer)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Orders__Customer__4FD1D5C8");
@@ -146,26 +155,28 @@ public partial class EnigmaWorkshopContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Products__3214EC078CB13366");
 
             entity.Property(e => e.Id).HasMaxLength(255);
-            entity.Property(e => e.Data).HasColumnType("text");
-            entity.Property(e => e.Des).HasColumnType("text");
-            entity.Property(e => e.Images).HasColumnType("text");
+            entity.Property(e => e.Data).HasColumnType("ntext");
+            entity.Property(e => e.Des).HasColumnType("ntext");
+            entity.Property(e => e.Images).HasColumnType("ntext");
             entity.Property(e => e.Name).HasMaxLength(255);
         });
 
         modelBuilder.Entity<ProductCategory>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Product_category");
+            entity.HasNoKey().ToTable("Product_category");
 
             entity.Property(e => e.Categories).HasMaxLength(255);
             entity.Property(e => e.Products).HasMaxLength(255);
 
-            entity.HasOne(d => d.CategoriesNavigation).WithMany()
+            entity
+                .HasOne(d => d.CategoriesNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.Categories)
                 .HasConstraintName("FK__Product_c__Categ__4CF5691D");
 
-            entity.HasOne(d => d.ProductsNavigation).WithMany()
+            entity
+                .HasOne(d => d.ProductsNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.Products)
                 .HasConstraintName("FK__Product_c__Produ__4DE98D56");
         });

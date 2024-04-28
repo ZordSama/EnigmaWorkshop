@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using NTJson = Newtonsoft.Json;
 
 namespace enigmaworkshop.backend.Models;
 
@@ -26,8 +28,10 @@ public partial class Customer
     public double? Point { get; set; }
 
     public string? User { get; set; }
-
+    [JsonIgnore]
+    [NTJson.JsonIgnore]
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
+    [JsonIgnore]
+    [NTJson.JsonIgnore]
     public virtual User? UserNavigation { get; set; }
 }

@@ -3,28 +3,7 @@ export type SiteConfig = typeof siteConfig;
 export const siteConfig = {
   name: "Enigma Workshop",
   description: "Gear for Game - Gear for Work - Gear for Life",
-  navItems: [
-    {
-      label: "Home",
-      href: "/",
-    },
-    {
-      label: "Docs",
-      href: "/docs",
-    },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
-    {
-      label: "Blog",
-      href: "/blog",
-    },
-    {
-      label: "About",
-      href: "/about",
-    },
-  ],
+  api : "http://localhost:5257/api/",
   navMenuItems: [
     {
       label: "Profile",
