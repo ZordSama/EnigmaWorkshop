@@ -14,7 +14,8 @@ function LoginBlock() {
     <>
       <div className="w-1/2">
         <h1 className="text-3xl font-bold">Chào mừng quay trở lại, Enigma</h1>
-        <LoginForm />
+        {/* <LoginForm /> */}
+        <CustomerForm/>
       </div>
     </>
   );
@@ -26,7 +27,7 @@ function RegisterWrapper() {
   const [stepNumValue, setStepNumValue] = useState(
     window.localStorage.getItem("stepNum"),
   );
-  
+
   useEffect(() => {
     const handleStorage = () => {
       const newValue = window.localStorage.getItem("stepNum");
@@ -53,7 +54,7 @@ function RegisterWrapper() {
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 1.0 }}
           className="flex h-5/6 w-full flex-col items-center justify-between"
         >
           <div>
@@ -62,8 +63,8 @@ function RegisterWrapper() {
             </h1>
             <span>placeholder for stepper</span>
           </div>
-          <div className="w-1/2">
-            {stepNumValue ? <CustomerForm /> : <RegisterForm />}
+          <div className="flex w-full flex-col items-center">
+            {stepNumValue === "1" ? <CustomerForm /> : <RegisterForm />}
           </div>
           <div></div>
         </motion.div>
@@ -76,6 +77,8 @@ export default function Auth() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [visible, setVisible] = useState(true);
   const visibleToggle = () => {
+    window.localStorage.setItem("stepNum", "0");
+    window.dispatchEvent(new Event("storage"));
     setVisible(!visible);
     setSelectedTab(1);
   };
@@ -86,7 +89,7 @@ export default function Auth() {
           <motion.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 1.0 }}
             className="flex h-5/6 w-full flex-col items-center justify-between"
           >
             {visible ? <div></div> : null}

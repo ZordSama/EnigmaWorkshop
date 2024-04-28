@@ -13,11 +13,22 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { getDistricts, getProvinces, getWards } from "vietnam-provinces";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const eMsg = {
   excessLimit: "Vượt quá giới hạn ký tự (255).",
-  tooShort: "Chim bạn ngắn bỏ mẹ, cút!",
+  tooShort: "Mục này tối thiểu 6 ký tự",
   isInvalid: "thông tin không hợp lệ",
+  isEmpty: "Không được để trống mục này",
 };
 
 const userSchema = z.object({
@@ -65,62 +76,54 @@ const registerSchema = userSchema
 // });
 
 const customerSchema = z.object({
-  firstName: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "Không thể để trống họ",
-    })
-    .max(30, {
-      message: "Tối đa là 30 ký tự",
-    }),
-
-  lastName: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "Không thể để trống tên",
-    })
-    .max(30, {
-      message: "Tối đa là 30 ký tự",
-    }),
-
-  gender: z.number().int(),
-
-  DoB: z.string(),
-
-  phone: z.string().trim().min(10).max(10, {
-    message: "Số điện thoại không hợp lệ",
+  firstName: z.string().trim().min(1, eMsg.isEmpty).max(30, {
+    message: "Tối đa là 30 ký tự",
   }),
 
-  email: z.string().email().trim().min(1, {
-    message: "Không thể để trống email",
+  lastName: z.string().trim().min(1, eMsg.isEmpty).max(30, {
+    message: "Tối đa là 30 ký tự",
   }),
+
+  gender: z.string().refine((value) => value != "", "phải chọn ở mục này"),
+
+  dob: z
+    .string()
+    .refine(
+      (value) =>
+        /(?:(?:(?:0?[13578]|1[02])(\/|-|\.)31)\1|(?:(?:0?[1,3-9]|1[0-2])(\/|-|\.)(?:29|30)\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:0?2(\/|-|\.)29\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:(?:0?[1-9])|(?:1[0-2]))(\/|-|\.)(?:0?[1-9]|1\d|2[0-8])\4(?:(?:1[6-9]|[2-9]\d)?\d{2})/.test(
+          value,
+        ),
+      {
+        message: "Ngày sinh không đúng định dạng",
+      },
+    ),
+
+  phone: z
+    .string()
+    .trim()
+    .refine(
+      (value) => /(84|0[3|5|7|8|9])+([0-9]{8})/.test(value),
+      "số điện thoại phải là số điện thoại Việt Nam hợp lệ!",
+    ),
+
+  email: z.string().email("Email không hợp lệ!").trim().min(1, eMsg.isEmpty),
 
   // Address info
 
-  street: z.string().trim().min(1, {
-    message: "Không thể để trống phố",
-  }),
+  street: z.string().trim().min(1, eMsg.isEmpty),
 
-  city: z.string().trim().min(1, {
-    message: "Không thể để trống thành phố",
-  }),
+  ward: z.string().trim().min(1, eMsg.isEmpty),
 
-  province: z.string().trim().min(1, {
-    message: "Không thể để trống tỉnh thành",
-  }),
+  district: z.string().trim().min(1, eMsg.isEmpty),
 
-  country: z.string().trim().min(1, {
-    message: "Không thể để trống quốc gia",
-  }),
+  province: z.string().trim().min(1, eMsg.isEmpty),
 });
 
-const UserFields = ({ loginForm }: { loginForm: any | undefined }) => {
+const UserFields = ({ currentForm }: { currentForm: any | undefined }) => {
   return (
     <>
       <FormField
-        control={loginForm.control}
+        control={currentForm.control}
         name="username"
         render={({ field }) => (
           <FormItem>
@@ -141,7 +144,7 @@ const UserFields = ({ loginForm }: { loginForm: any | undefined }) => {
       />
 
       <FormField
-        control={loginForm.control}
+        control={currentForm.control}
         name="password"
         render={({ field }) => (
           <FormItem className="mt-3">
@@ -173,7 +176,7 @@ export function LoginForm() {
   return (
     <Form {...loginForm}>
       <form onSubmit={loginForm.handleSubmit(onSubmit)} className="mt-5">
-        <UserFields loginForm={loginForm} />
+        <UserFields currentForm={loginForm} />
         <Button
           className="mt-5 h-12 w-full"
           variant={"secondary"}
@@ -193,13 +196,17 @@ export function RegisterForm() {
   });
   function onSubmit(values: z.infer<typeof registerSchema>) {
     console.log(values);
+    window.localStorage.setItem("userReg", JSON.stringify(values, null, 4));
     window.localStorage.setItem("stepNum", "1");
     window.dispatchEvent(new Event("storage"));
   }
   return (
     <Form {...registerForm}>
-      <form onSubmit={registerForm.handleSubmit(onSubmit)} className="mt-5">
-        <UserFields loginForm={registerForm} />
+      <form
+        onSubmit={registerForm.handleSubmit(onSubmit)}
+        className="mt-5 w-1/2"
+      >
+        <UserFields currentForm={registerForm} />
         <FormField
           control={registerForm.control}
           name="confirmPassword"
@@ -236,94 +243,119 @@ export function RegisterForm() {
 export function CustomerForm() {
   const customerForm = useForm<z.infer<typeof customerSchema>>({
     resolver: zodResolver(customerSchema),
-    defaultValues: {},
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      gender: "",
+      dob: "",
+      phone: "",
+      email: "",
+      street: "",
+      ward: "",
+      district: "",
+      province: "",
+    },
   });
   function onSubmit(values: z.infer<typeof customerSchema>) {
-    console.log(values);
+    const req = {
+      user: JSON.parse(window.localStorage.getItem("userReg") || "{}"),
+      customer: values,
+    };
   }
   return (
     <Form {...customerForm}>
-      <form onSubmit={customerForm.handleSubmit(onSubmit)} className="mt-5">
-        <FormField
-          control={customerForm.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem className="mt-3">
-              <FormLabel>Họ</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Nhập họ"
-                  {...field}
-                  style={{ color: "slategray", fontWeight: "bold" }}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={customerForm.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem className="mt-3">
-              <FormLabel>Tên</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Nhập tên"
-                  {...field}
-                  style={{ color: "slategray", fontWeight: "bold" }}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={customerForm.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem className="mt-3">
-              <FormLabel>Giới tính</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Nhập giới tính"
-                  {...field}
-                  style={{ color: "slategray", fontWeight: "bold" }}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={customerForm.control}
-          name="DoB"
-          render={({ field }) => (
-            <FormItem className="mt-3">
-              <FormLabel>Ngày sinh</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Nhập ngày sinh"
-                  {...field}
-                  style={{ color: "slategray", fontWeight: "bold" }}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={customerForm.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem className="mt-3">
-              <FormLabel>Số điện thoại</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Nhập số điện thoại"
-                  {...field}
-                  style={{ color: "slategray", fontWeight: "bold" }}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+      <form
+        onSubmit={customerForm.handleSubmit(onSubmit)}
+        className="mt-5 flex flex-col"
+      >
+        <div className="flex flex-row gap-5">
+          <FormField
+            control={customerForm.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Họ</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Họ"
+                    {...field}
+                    style={{ color: "slategray", fontWeight: "bold" }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={customerForm.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Tên</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Tên"
+                    {...field}
+                    style={{ color: "slategray", fontWeight: "bold" }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex flex-row gap-5">
+          <FormField
+            control={customerForm.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem
+                style={{ color: "slategray", fontWeight: "bold" }}
+                className="mt-3 w-1/2"
+              >
+                <FormLabel className="text-white">Giới tính</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue {...field} placeholder="Chọn giới tính" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="0">Nam</SelectItem>
+                        <SelectItem value="1">Nữ</SelectItem>
+                        <SelectItem value="2">Khác</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={customerForm.control}
+            name="dob"
+            render={({ field }) => (
+              <FormItem className="mt-3 w-1/2">
+                <FormLabel>Tên</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    className="hidden"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <Button
+          className="mt-5 h-12 w-full"
+          variant={"secondary"}
+          type="submit"
+        >
+          Hoàn tất đăng ký
+        </Button>
       </form>
     </Form>
   );
