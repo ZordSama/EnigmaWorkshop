@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Authorization;
+using enigmaworkshop.backend.Authorization;
+using enigmaworkshop.backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace enigmaworkshop.backend.Controllers
 {
@@ -9,10 +11,10 @@ namespace enigmaworkshop.backend.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly DataSevices _db;
-        private readonly JwtServices _jwt;
+        private readonly EnigmaWorkshopContext _db;
+        private readonly IJwtServices _jwt;
 
-        public AuthController(DataSevices db, JwtServices jwt)
+        public AuthController(EnigmaWorkshopContext db, IJwtServices jwt)
         {
             _db = db; _jwt = jwt;
         }
@@ -21,11 +23,40 @@ namespace enigmaworkshop.backend.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult Login(DangNhapDTO dto)
+        public IActionResult Login(LoginDTO dto)
         {
-            var ngDung = _db.GetUserByUsername(dto.TenNgDung);
-            if (ngDung == null || ngDung.MatKhau != dto.MatKhau) return Unauthorized("Invalid username or password.");
-            return Ok(new { token = _jwt.GenerateToken(ngDung), User });
+            var user = _db.Users.FirstOrDefault(u => u.Username == dto.Username);
+
+            if (user == null || user.Password != dto.Password) return Unauthorized("Invalid username or password.");
+            var customer = _db.Customers.FirstOrDefault(c => c.User == user.Id);
+            var employee = _db.Employees.FirstOrDefault(e => e.User == user.Id);
+            return Ok(new { token = _jwt.GenerateToken(user), customer = JsonConvert.SerializeObject(customer), employee = JsonConvert.SerializeObject(employee) });
         }
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public IActionResult Register(RegisterDTO dto)
+        {
+            if (_db.Users.FirstOrDefault(u => u.Username == dto.user.Username) != null) return Conflict("Username already exists.");
+            try
+            {
+                User user = new User { Id = Guid.NewGuid().ToString(), Username = dto.user.Username, Password = dto.user.Password };
+                _db.Users.Add(user);
+                Customer customer = new Customer { Id = Guid.NewGuid().ToString(), User = user.Id, FirstName = dto.customer.FirstName, LastName = dto.customer.LastName, Address = JsonConvert.SerializeObject(dto.customer.Address), DoB = dto.customer.DoB, Email = dto.customer.Email, Phone = dto.customer.Phone, Gender = dto.customer.Gender  };
+                _db.Customers.Add(customer);
+                _db.SaveChanges();
+                return Ok("User registered successfully.");
+            }
+            catch (Exception ex) { return Problem(title: ex.Message, detail: ex.StackTrace); }
+        }
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout() { return Ok("User logged out successfully."); }
+        [HttpGet("me")]
+        [Authorize]
+        public IActionResult Me() { return Ok(User); }
+        // [HttpGet("refresh")]
+        // [Authorize]
+        // public IActionResult Refresh() { return Ok(new { token = _jwt.GenerateToken(User), User });
+        // }
     }
 }

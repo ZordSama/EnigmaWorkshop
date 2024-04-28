@@ -3,6 +3,7 @@ import { fontSans } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 import clsx from "clsx";
 import { Viewport, Metadata } from "next";
+import { ThemeProvider } from "@/components/themesprovider";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -32,12 +33,10 @@ export default function AuthLayout({
       <body
         className={clsx(
           "h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          fontSans.variable,
         )}
       >
-        <main className="h-screen w-screen">
-          {children}
-        </main>
+        <main className="h-screen w-screen">{children}</main>
       </body>
     </html>
   );

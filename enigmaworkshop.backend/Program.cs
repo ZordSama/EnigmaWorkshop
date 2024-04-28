@@ -22,15 +22,15 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-        ValidateIssuer = false,
+        ValidateIssuer = true,
         ValidateAudience = false,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
 });
 
-builder.Services.AddScoped<DataSevices>();
-builder.Services.AddScoped<JwtServices>();
+// builder.Services.AddScoped<DataSevices>();
+builder.Services.AddScoped<IJwtServices, JwtServices>();
 
 // Add services to the container.
 
@@ -77,7 +77,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<AuthMiddleware>();
 app.UseAuthorization();
 app.UseAuthentication();
 
