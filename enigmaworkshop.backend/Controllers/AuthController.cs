@@ -25,7 +25,7 @@ namespace enigmaworkshop.backend.Controllers
             var user = _db.Users.FirstOrDefault(u => u.Username == dto.Username);
 
             if (user == null || user.Password != dto.Password)
-                return Unauthorized("Invalid username or password.");
+                return Unauthorized("Tên đăng nhập hoặc mật khẩu không đúng.");
             var customer = _db.Customers.FirstOrDefault(c => c.User == user.Id);
             var employee = _db.Employees.FirstOrDefault(e => e.User == user.Id);
             return Ok(
@@ -61,7 +61,7 @@ namespace enigmaworkshop.backend.Controllers
                     FirstName = dto.customer.FirstName,
                     LastName = dto.customer.LastName,
                     Address = JsonConvert.SerializeObject(dto.customer.Address),
-                    DoB = DateOnly.FromDateTime( dto.customer.DoB),
+                    DoB = DateOnly.FromDateTime(dto.customer.DoB),
                     Email = dto.customer.Email,
                     Phone = dto.customer.Phone,
                     Gender = dto.customer.Gender

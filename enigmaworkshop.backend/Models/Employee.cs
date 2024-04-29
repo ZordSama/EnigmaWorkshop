@@ -26,9 +26,9 @@ public partial class Employee
     public DateOnly? OptIn { get; set; }
 
     public DateOnly? OptOut { get; set; }
-    [JsonIgnore]
-    [NTJson.JsonIgnore]
+
     public string? User { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
     public virtual User? UserNavigation { get; set; }

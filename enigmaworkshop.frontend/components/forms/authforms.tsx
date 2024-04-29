@@ -36,6 +36,8 @@ import { SetStateAction, useState } from "react";
 import axios from "axios";
 import { siteConfig } from "@/config/site";
 import { useRouter } from "next/navigation";
+import { useToast } from "../ui/use-toast";
+import { getReasonPhrase } from "http-status-codes";
 
 const eMsg = {
   excessLimit: "Vượt quá giới hạn ký tự (255).",
@@ -130,12 +132,33 @@ const customerSchema = z.object({
 });
 
 export function LoginForm() {
+  const { toast } = useToast();
+  const router = useRouter();
   const loginForm = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
     defaultValues: { username: "", password: "" },
   });
-  function onSubmit(values: z.infer<typeof userSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof userSchema>) {
+    const resp = await axios
+      .post(siteConfig.api + "Auth/login", values).then((resp) => {
+        if (resp.status === 200) {
+          sessionStorage.setItem("token", resp.data.token);
+          sessionStorage.setItem("user", JSON.stringify(resp.data.user));
+          sessionStorage.setItem("customer", JSON.stringify(resp.data.customer));
+          router.push("/home");
+        }
+      })
+      .catch(function (error) {
+        if (error.response) {
+          console.log('error', error)
+          toast({
+            title: error.response.data,
+            description: getReasonPhrase(error.response.status),
+            variant: "destructive",
+          });
+        }
+      });
+    // if (resp.status === 200) router.push("/home");
   }
   return (
     <Form {...loginForm}>
@@ -300,6 +323,7 @@ export function RegisterForm() {
 }
 
 export function CustomerForm() {
+  const router = useRouter();
   const customerForm = useForm<z.infer<typeof customerSchema>>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
@@ -376,7 +400,6 @@ export function CustomerForm() {
       if (login.status === 200) {
         sessionStorage.setItem("token", login.data.token);
         sessionStorage.setItem("user", JSON.stringify(login.data.user));
-        const router = useRouter();
         router.push("/home");
       }
     }
