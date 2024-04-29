@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using NTJson = Newtonsoft.Json;
 
 namespace enigmaworkshop.backend.Models;
 
@@ -18,4 +20,10 @@ public partial class Product
     public string? Data { get; set; }
 
     public string? Images { get; set; }
+
+    public string? Category { get; set; }
+
+    [JsonIgnore]
+    [NTJson.JsonIgnore]
+    public virtual Category? CategoryNavigation { get; set; }
 }

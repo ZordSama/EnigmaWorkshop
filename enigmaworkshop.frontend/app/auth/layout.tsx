@@ -4,6 +4,7 @@ import { siteConfig } from "@/config/site";
 import clsx from "clsx";
 import { Viewport, Metadata } from "next";
 import { ThemeProvider } from "@/components/themesprovider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -37,6 +38,7 @@ export default function AuthLayout({
         )}
       >
         <main className="h-screen w-screen">{children}</main>
+        <Toaster/>
       </body>
     </html>
   );

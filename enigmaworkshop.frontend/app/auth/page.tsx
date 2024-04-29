@@ -14,8 +14,7 @@ function LoginBlock() {
     <>
       <div className="w-1/2">
         <h1 className="text-3xl font-bold">Chào mừng quay trở lại, Enigma</h1>
-        {/* <LoginForm /> */}
-        <CustomerForm/>
+        <LoginForm />
       </div>
     </>
   );

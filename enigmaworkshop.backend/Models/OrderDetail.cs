@@ -5,15 +5,17 @@ using NTJson = Newtonsoft.Json;
 
 namespace enigmaworkshop.backend.Models;
 
-public partial class OderDetail
+public partial class OrderDetail
 {
-    public string Oder { get; set; } = null!;
+    public string OrderId { get; set; } = null!;
 
     public string Product { get; set; } = null!;
 
+    public int? Quantity { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
-    public virtual Order OderNavigation { get; set; } = null!;
+    public virtual Order Order { get; set; } = null!;
 
     [JsonIgnore]
     [NTJson.JsonIgnore]
