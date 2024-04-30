@@ -23,7 +23,8 @@ namespace enigmaworkshop.backend.Controllers
         public IActionResult Login(LoginDTO dto)
         {
             var user = _db.Users.FirstOrDefault(u => u.Username == dto.Username);
-
+            // hash the dto password
+            
             if (user == null || user.Password != dto.Password)
                 return Unauthorized("Tên đăng nhập hoặc mật khẩu không đúng.");
             var customer = _db.Customers.FirstOrDefault(c => c.User == user.Id);
