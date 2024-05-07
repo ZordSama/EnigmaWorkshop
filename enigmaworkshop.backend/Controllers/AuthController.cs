@@ -24,7 +24,7 @@ namespace enigmaworkshop.backend.Controllers
         {
             var user = _db.Users.FirstOrDefault(u => u.Username == dto.Username);
 
-            if (user == null || user.Password != dto.Password)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
                 return Unauthorized("Tên đăng nhập hoặc mật khẩu không đúng.");
             var customer = _db.Customers.FirstOrDefault(c => c.User == user.Id);
             var employee = _db.Employees.FirstOrDefault(e => e.User == user.Id);
@@ -51,7 +51,7 @@ namespace enigmaworkshop.backend.Controllers
                 {
                     Id = Guid.NewGuid().ToString(),
                     Username = dto.user.Username,
-                    Password = dto.user.Password
+                    Password = BCrypt.Net.BCrypt.HashPassword(dto.user.Password)
                 };
                 _db.Users.Add(user);
                 Customer customer = new Customer
@@ -94,7 +94,7 @@ namespace enigmaworkshop.backend.Controllers
         [Authorize]
         public IActionResult Me()
         {
-            return Ok(User);
+            return Ok(new{user = HttpContext.Items["User"]});
         }
         // [HttpGet("refresh")]
         // [Authorize]
