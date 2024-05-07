@@ -53,7 +53,8 @@ public class JwtServices : IJwtServices
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = key,
                     ValidateIssuer = true,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidIssuer = _config["Jwt:Issuer"],
                 },
                 out SecurityToken validatedToken
             );

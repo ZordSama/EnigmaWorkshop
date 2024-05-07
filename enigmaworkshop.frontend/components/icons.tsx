@@ -1,21 +1,15 @@
 import * as React from "react";
 import { IconSvgProps } from "@/types";
-import { LucideProps, ShoppingCart, User } from "lucide-react";
-interface IconProps extends Omit<LucideProps, 'ref'> {
-  }
-export const CartIcon: React.FC<IconProps> = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}) => <ShoppingCart width={size || width} height={size || height} {...props} />;
+import { Boxes, LayoutDashboard, NotepadText, ShoppingCart, Truck, User } from "lucide-react";
 
-export const UserIcon: React.FC<IconProps> = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}) => <User width={size || width} height={size || height} {...props} />;
+export const Icons = {
+  cart: ShoppingCart,
+  user: User,
+  dashboard: LayoutDashboard,
+  shipments: Truck,
+  employees: NotepadText,
+  inventory: Boxes
+};
 
 export const Logo: React.FC<IconSvgProps> = ({
   size = 36,
@@ -29,7 +23,7 @@ export const Logo: React.FC<IconSvgProps> = ({
     viewBox="-51.2 -51.2 614.40 614.40"
     xmlns="http://www.w3.org/2000/svg"
     fill="#ffffff"
-	{...props}
+    {...props}
   >
     <g
       id="SVGRepo_bgCarrier"

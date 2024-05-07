@@ -22,8 +22,7 @@ import {
   GithubIcon,
   DiscordIcon,
   SearchIcon,
-  CartIcon,
-  UserIcon,
+  Icons
 } from "@/components/icons";
 
 import { Logo } from "@/components/icons";
@@ -46,6 +45,9 @@ const navItems = [
 		href: "/blog",
 	  },
 ]
+const CartIcon = Icons.cart;
+const UserIcon = Icons.user;
+
 
 export const Navbar = () => {
   const searchInput = (
