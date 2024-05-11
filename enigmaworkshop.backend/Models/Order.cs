@@ -19,7 +19,7 @@ public partial class Order
 
     public double? Total { get; set; }
 
-    public string? Breakdown { get; set; }
+    public string? Data { get; set; }
 
     [JsonIgnore]
     [NTJson.JsonIgnore]

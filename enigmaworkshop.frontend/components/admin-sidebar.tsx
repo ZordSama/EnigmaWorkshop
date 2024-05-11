@@ -34,12 +34,12 @@ const SidebarItems = [
     href: "/dashboard/inventory",
     icon: Icons.inventory,
     authorize: [0, 1, 2],
-  }
+  },
 ];
 export const AdminSidebar = () => {
   const pathname = usePathname();
   return (
-    <div className="hidden h-screen w-64 border-r border-gray-700 bg-background pt-16 sm:flex">
+    <div className="hidden h-screen w-64 min-w-64 border-r border-gray-700 bg-background pt-16 sm:flex">
       <nav className="flex w-full flex-col items-start space-y-2 px-4 pt-5">
         {SidebarItems.map((item, index) => {
           const Icon = item.icon;
@@ -48,7 +48,7 @@ export const AdminSidebar = () => {
               key={index}
               href={item.href}
               className={cn(
-                "flex h-12 w-full items-center space-x-2 rounded-md bg-opacity-45 px-3 font-medium transition-all duration-200 hover:translate-x-1 hover:text-white hover:bg-opacity-45",
+                "flex h-12 w-full items-center space-x-2 rounded-md bg-opacity-45 px-3 font-medium transition-all duration-200 hover:translate-x-1 hover:bg-opacity-45 hover:text-white",
                 pathname === item.href
                   ? "-translate-x-1 bg-indigo-400 text-white"
                   : "bgop hover:bg-slate-600",

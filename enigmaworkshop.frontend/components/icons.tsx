@@ -1,6 +1,14 @@
 import * as React from "react";
 import { IconSvgProps } from "@/types";
-import { Boxes, LayoutDashboard, NotepadText, ShoppingCart, Truck, User } from "lucide-react";
+import {
+  Boxes,
+  LayoutDashboard,
+  NotepadText,
+  ShoppingCart,
+  Truck,
+  User,
+  X,
+} from "lucide-react";
 
 export const Icons = {
   cart: ShoppingCart,
@@ -8,7 +16,8 @@ export const Icons = {
   dashboard: LayoutDashboard,
   shipments: Truck,
   employees: NotepadText,
-  inventory: Boxes
+  inventory: Boxes,
+  x: X,
 };
 
 export const Logo: React.FC<IconSvgProps> = ({
