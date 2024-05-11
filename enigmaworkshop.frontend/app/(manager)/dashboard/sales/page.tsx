@@ -10,6 +10,8 @@ import { DataTableColumnHeader } from "@/components/datatable/table-header";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface TabTriggerProps extends Tabs.TabsTriggerProps {}
 interface SaleTabProps extends Tabs.TabsContentProps {
@@ -95,7 +97,7 @@ export default function SalesPage() {
               setActiveTab(row.original.id);
             }}
           >
-            <EyeOpenIcon/>
+            <EyeOpenIcon />
           </Button>
         );
       },
@@ -144,7 +146,56 @@ export default function SalesPage() {
         {...props}
         className={cn(isActive && "flex grow flex-col", props.className)}
       >
-        <span>{props.order_id}</span>
+        <div className="flex h-full w-full flex-col p-4">
+          <span className="font-bold text-4xl">Thông tin đơn hàng </span>
+          <div className="flex flex-row gap-2 p-2">
+            <Card className="w-2/5">
+              <CardHeader>
+                <CardTitle>Thông tin Giao hàng</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex grow flex-col gap-2">
+                  <div className="flex flex-row justify-between">
+                    <span>Khách Hàng:</span>
+                    <span>Nguyễn Văn A</span>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-row justify-between">
+                    <span>Email:</span>
+                    <span>ngvana.123@example.com</span>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-row justify-between">
+                    <span>Số điện thoại:</span>
+                    <span>19001008</span>
+                  </div>
+                  <Separator />
+                  <div className="grid grid-cols-2 justify-between gap-3">
+                    <div className="font-semibold">Địa chỉ giao hàng:</div>
+                    <address className="text-end not-italic">
+                      Số 4 Ngõ 6 Đường A, Phường B, Thành Phố C, Tỉnh E4ewqeqwdasdwqdasdaw asdasdw asd awd asd ẳdfad
+                    </address>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-row justify-between">
+                    <span>Trạng thái thanh toán:</span>
+                    <span>Đã thanh toán, Trace: 23ksjd12da</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="w-3/5">
+              <CardHeader>
+                <CardTitle>Chi tiết đơn hàng</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-2">
+                  
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </Tabs.Content>
     );
   };
@@ -166,6 +217,7 @@ export default function SalesPage() {
             </div>
           ))}
         </Tabs.List>
+        <Separator/>
         <Tabs.Content
           value="default"
           className={activeTab === "default" ? "flex grow flex-col" : ""}
