@@ -4,14 +4,14 @@ import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useState } from "react";
-import { Order } from "@/components/datatable/order";
 import { DataTable } from "@/components/datatable/data-table";
 import { DataTableColumnHeader } from "@/components/datatable/table-header";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { EyeOpenIcon } from "@radix-ui/react-icons";
+import { EyeOpenIcon, Pencil1Icon, ReaderIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Order } from "@/types";
 
 interface TabTriggerProps extends Tabs.TabsTriggerProps {}
 interface SaleTabProps extends Tabs.TabsContentProps {
@@ -147,7 +147,7 @@ export default function SalesPage() {
         className={cn(isActive && "flex grow flex-col", props.className)}
       >
         <div className="flex h-full w-full flex-col p-4">
-          <span className="font-bold text-4xl">Thông tin đơn hàng </span>
+          <span className="text-4xl font-bold">Thông tin đơn hàng </span>
           <div className="flex flex-row gap-2 p-2">
             <Card className="w-2/5">
               <CardHeader>
@@ -173,7 +173,8 @@ export default function SalesPage() {
                   <div className="grid grid-cols-2 justify-between gap-3">
                     <div className="font-semibold">Địa chỉ giao hàng:</div>
                     <address className="text-end not-italic">
-                      Số 4 Ngõ 6 Đường A, Phường B, Thành Phố C, Tỉnh E4ewqeqwdasdwqdasdaw asdasdw asd awd asd ẳdfad
+                      Số 4 Ngõ 6 Đường A, Phường B, Thành Phố C, Tỉnh
+                      E4ewqeqwdasdwqdasdaw asdasdw asd awd asd ẳdfad
                     </address>
                   </div>
                   <Separator />
@@ -190,10 +191,188 @@ export default function SalesPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-2">
-                  
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className=""></div>
+                    <div className="col-span-4 flex place-content-center items-center">
+                      <span>Tên mặt hàng</span>
+                    </div>
+                    <div className="col-span-2 flex place-content-center items-center">
+                      <span>Đơn giá</span>
+                    </div>
+                    <div className="flex place-content-center items-center">
+                      <span>Số lượng</span>
+                    </div>
+                    <div className="col-span-3 flex place-content-center items-center">
+                      <span>Thành tiền</span>
+                    </div>
+                    <div className="flex items-center"></div>
+                  </div>
+                  <hr />
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="">
+                      <img
+                        src="https://i.imgur.com/V0QJ4x9.jpeg"
+                        alt="Product Image"
+                        className="h-16 w-16"
+                      />
+                    </div>
+                    <div className="col-span-4 flex place-content-center items-center">
+                      <span>Nvidia RTX 4090 OC GIGABYTE</span>
+                    </div>
+                    <div className="col-span-2 flex place-content-center items-center">
+                      <span>12.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex place-content-center items-center">
+                      <span>
+                        10{" "}
+                        <Button variant={"outline"} size={"icon"}>
+                          <Pencil1Icon />
+                        </Button>
+                      </span>
+                    </div>
+                    <div className="col-span-3 flex place-content-center items-center">
+                      <span>120.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Button variant={"outline"} size={"icon"}>
+                        <ReaderIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  <Separator className="last:hidden" />
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="">
+                      <img
+                        src="https://i.imgur.com/V0QJ4x9.jpeg"
+                        alt="Product Image"
+                        className="h-16 w-16"
+                      />
+                    </div>
+                    <div className="col-span-4 flex place-content-center items-center">
+                      <span>Nvidia RTX 4090 OC GIGABYTE</span>
+                    </div>
+                    <div className="col-span-2 flex place-content-center items-center">
+                      <span>12.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex place-content-center items-center">
+                      <span>
+                        10{" "}
+                        <Button variant={"outline"} size={"icon"}>
+                          <Pencil1Icon />
+                        </Button>
+                      </span>
+                    </div>
+                    <div className="col-span-3 flex place-content-center items-center">
+                      <span>120.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Button variant={"outline"} size={"icon"}>
+                        <ReaderIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  <Separator className="last:hidden" />
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="">
+                      <img
+                        src="https://i.imgur.com/V0QJ4x9.jpeg"
+                        alt="Product Image"
+                        className="h-16 w-16"
+                      />
+                    </div>
+                    <div className="col-span-4 flex place-content-center items-center">
+                      <span>Nvidia RTX 4090 OC GIGABYTE</span>
+                    </div>
+                    <div className="col-span-2 flex place-content-center items-center">
+                      <span>12.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex place-content-center items-center">
+                      <span>
+                        10{" "}
+                        <Button variant={"outline"} size={"icon"}>
+                          <Pencil1Icon />
+                        </Button>
+                      </span>
+                    </div>
+                    <div className="col-span-3 flex place-content-center items-center">
+                      <span>120.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Button variant={"outline"} size={"icon"}>
+                        <ReaderIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  <Separator className="last:hidden" />
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="">
+                      <img
+                        src="https://i.imgur.com/V0QJ4x9.jpeg"
+                        alt="Product Image"
+                        className="h-16 w-16"
+                      />
+                    </div>
+                    <div className="col-span-4 flex place-content-center items-center">
+                      <span>Nvidia RTX 4090 OC GIGABYTE</span>
+                    </div>
+                    <div className="col-span-2 flex place-content-center items-center">
+                      <span>12.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex place-content-center items-center">
+                      <span>
+                        10{" "}
+                        <Button variant={"outline"} size={"icon"}>
+                          <Pencil1Icon />
+                        </Button>
+                      </span>
+                    </div>
+                    <div className="col-span-3 flex place-content-center items-center">
+                      <span>120.000.000 VNĐ</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Button variant={"outline"} size={"icon"}>
+                        <ReaderIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  {/* <Separator className="last:hidden" /> */}
+                  <hr />
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="col-span-8 flex place-content-start items-center">
+                      <span>Khuyến mãi:</span>
+                    </div>
+                    <div className="col-span-3 flex place-content-center items-center">
+                      <span className="text-red-500">-800.000 VNĐ</span>
+                    </div>
+                    <div>
+                      <Button variant={"outline"} size={"icon"}>
+                        <ReaderIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="col-span-8 flex place-content-start items-center">
+                      <span>Tổng cộng:</span>
+                    </div>
+                    <div className="col-span-3 flex place-content-center items-center">
+                      <span className="text-lg font-bold">
+                        8.000.000.000 VNĐ
+                      </span>
+                    </div>
+                    <div>
+                      <Button variant={"outline"} size={"icon"}>
+                        <ReaderIcon />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+          </div>
+          <div className="flex w-full flex-row justify-end gap-3 px-10 mt-2">
+            <Button variant={"destructive"}>Từ chối đơn hàng</Button>
+            <Button>Xác nhận xuất kho</Button>
           </div>
         </div>
       </Tabs.Content>
@@ -217,7 +396,7 @@ export default function SalesPage() {
             </div>
           ))}
         </Tabs.List>
-        <Separator/>
+        <Separator />
         <Tabs.Content
           value="default"
           className={activeTab === "default" ? "flex grow flex-col" : ""}
