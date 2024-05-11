@@ -5,6 +5,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-      <div className="h-full w-full p-6">{children}</div>
+      <div className="h-full w-full max-h-screen p-6">{children}</div>
   );
 }
