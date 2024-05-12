@@ -33,14 +33,15 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { PlusIcon } from "@radix-ui/react-icons";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
-declare module '@tanstack/react-table' {
+declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
-    title: string
+    title: string;
   }
 }
 
@@ -74,7 +75,10 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center gap-2 py-4">
+        <Button>
+          <PlusIcon /> <span className="ms-1">Thêm mới</span>
+        </Button>
         <Input
           placeholder="Lọc "
           value={table.getColumn("id")?.getFilterValue() as string}
