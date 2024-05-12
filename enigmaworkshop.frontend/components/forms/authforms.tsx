@@ -38,7 +38,6 @@ import { siteConfig } from "@/config/site";
 import { useRouter } from "next/navigation";
 import { useToast } from "../ui/use-toast";
 import { getReasonPhrase } from "http-status-codes";
-
 const eMsg = {
   excessLimit: "Vượt quá giới hạn ký tự (255).",
   tooShort: "Mục này tối thiểu 6 ký tự",
@@ -140,17 +139,22 @@ export function LoginForm() {
   });
   async function onSubmit(values: z.infer<typeof userSchema>) {
     const resp = await axios
-      .post(siteConfig.api + "Auth/login", values).then((resp) => {
+      .post(siteConfig.api + "Auth/login", values)
+      .then((resp) => {
         if (resp.status === 200) {
-          sessionStorage.setItem("token", resp.data.token);
-          sessionStorage.setItem("user", JSON.stringify(resp.data.user));
-          sessionStorage.setItem("customer", JSON.stringify(resp.data.customer));
+          // sessionStorage.setItem("token", resp.data.token);
+          // sessionStorage.setItem("user", JSON.stringify(resp.data.user));
+          // sessionStorage.setItem("customer", JSON.stringify(resp.data.customer));
+          localStorage.setItem("token", resp.data.token);
+          localStorage.setItem("user", JSON.stringify(resp.data.user));
+          localStorage.setItem("customer", JSON.stringify(resp.data.customer));
+          localStorage.setItem("employee", JSON.stringify(resp.data.employee));
           router.push("/home");
         }
       })
       .catch(function (error) {
         if (error.response) {
-          console.log('error', error)
+          console.log("error", error);
           toast({
             title: error.response.data,
             description: getReasonPhrase(error.response.status),
@@ -398,8 +402,10 @@ export function CustomerForm() {
       window.dispatchEvent(new Event("storage"));
       const login = await axios.post(siteConfig.api + "Auth/login", req.user);
       if (login.status === 200) {
-        sessionStorage.setItem("token", login.data.token);
-        sessionStorage.setItem("user", JSON.stringify(login.data.user));
+        localStorage.setItem("token", resp.data.token);
+        localStorage.setItem("user", JSON.stringify(resp.data.user));
+        localStorage.setItem("customer", JSON.stringify(resp.data.customer));
+        localStorage.setItem("employee", JSON.stringify(resp.data.employee));
         router.push("/home");
       }
     }

@@ -34,3 +34,21 @@ export type Employee = Person & {
   optIn:Date;
   optOut:Date;
 }
+
+type User = {
+  id: string;
+  username: string;
+  password?: string;
+  role: number;
+  status: number;
+}
+
+export type Produtct ={
+  id: string;
+  name: string;
+  des: string;
+  price: number;
+  stock: number;
+  category: string;
+  data?: {};
+}

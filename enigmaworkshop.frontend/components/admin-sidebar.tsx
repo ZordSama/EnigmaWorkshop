@@ -35,6 +35,12 @@ const SidebarItems = [
     icon: Icons.inventory,
     authorize: [0, 1, 2],
   },
+  {
+    title: "Quản lý Người dùng",
+    href: "/dashboard/users",
+    icon: Icons.users,
+    authorize: [0, 1, 2],
+  }
 ];
 export const AdminSidebar = () => {
   const pathname = usePathname();

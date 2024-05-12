@@ -17,15 +17,13 @@ export default function EmployeesPage() {
         headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
       },
     );
-    console.log("resp", resp);
     if (resp.status === 200) setEmployees(resp.data);
     else setEmployees([]);
-    console.log(resp.data);
   }
+  
   useEffect(() => {
     getEmployees();
   }, []);
-  //   setEmployees()
 
   const employeeColumn: ColumnDef<Employee>[] = [
     {
