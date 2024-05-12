@@ -82,7 +82,8 @@ export default function SalesPage() {
       },
     },
     {
-      id: "actions",
+      id: "Actions",
+      enableHiding: false,
       cell: ({ row }) => {
         return (
           <Button
@@ -370,7 +371,7 @@ export default function SalesPage() {
               </CardContent>
             </Card>
           </div>
-          <div className="flex w-full flex-row justify-end gap-3 px-10 mt-2">
+          <div className="mt-2 flex w-full flex-row justify-end gap-3 px-10">
             <Button variant={"destructive"}>Từ chối đơn hàng</Button>
             <Button>Xác nhận xuất kho</Button>
           </div>
