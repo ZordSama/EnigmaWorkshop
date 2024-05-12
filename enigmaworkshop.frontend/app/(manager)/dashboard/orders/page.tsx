@@ -67,6 +67,7 @@ export default function OrdersPage() {
     },
     {
       id: "Actions",
+      enableHiding: false,
       cell: ({ row }) => {
         return (
           <div className="flex gap-2">

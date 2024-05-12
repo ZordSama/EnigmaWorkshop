@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   Truck,
   User,
+  UsersRound,
   X,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ export const Icons = {
   employees: NotepadText,
   inventory: Boxes,
   x: X,
+  users: UsersRound,
 };
 
 export const Logo: React.FC<IconSvgProps> = ({

@@ -33,14 +33,16 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
+import { hasLeastOneKey } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
-declare module '@tanstack/react-table' {
+declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
-    title: string
+    title: string;
   }
 }
 
@@ -65,6 +67,7 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
 
     onColumnVisibilityChange: setColumnVisibility,
+
     state: {
       sorting,
       columnVisibility,
@@ -72,9 +75,21 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const DeleteBtn = () => {
+    if (data.length > 0) if (!hasLeastOneKey(data[0], ["category"])) return "";
+    return (
+      <Button variant={"destructive"}>
+        <TrashIcon /> <span className="ms-1">Xóa</span>
+      </Button>
+    );
+  };
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center gap-2 py-4">
+        <Button>
+          <PlusIcon /> <span className="ms-1">Thêm mới</span>
+        </Button>
+        <DeleteBtn />
         <Input
           placeholder="Lọc "
           value={table.getColumn("id")?.getFilterValue() as string}
@@ -131,7 +146,7 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="w-full">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
