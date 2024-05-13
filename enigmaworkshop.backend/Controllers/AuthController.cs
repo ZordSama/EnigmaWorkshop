@@ -94,7 +94,7 @@ namespace enigmaworkshop.backend.Controllers
         [Authorize]
         public IActionResult Me()
         {
-            return Ok(new{user = HttpContext.Items["User"]});
+            return Ok(new { user = HttpContext.Items["User"] });
         }
         // [HttpGet("refresh")]
         // [Authorize]

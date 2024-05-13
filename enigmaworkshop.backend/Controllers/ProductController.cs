@@ -8,7 +8,6 @@ namespace enigmaworkshop.backend.Controllers;
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
 {
-
     private readonly EnigmaWorkshopContext _db;
 
     public ProductController(EnigmaWorkshopContext db)
@@ -16,7 +15,7 @@ public class ProductController : ControllerBase
         _db = db;
     }
 
-    [HttpGet("getProducts")]
+    [HttpGet("getAll")]
     [AllowAnonymous]
     public IActionResult GetProducts()
     {
@@ -30,7 +29,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpGet("getProduct/{id}")]
+    [HttpGet("get/{id}")]
     [AllowAnonymous]
     public IActionResult GetProduct([FromQuery] string id)
     {
@@ -57,6 +56,7 @@ public class ProductController : ControllerBase
             return Problem(title: ex.Message, detail: ex.StackTrace);
         }
     }
+
     [HttpGet("getTags")]
     [AllowAnonymous]
     public IActionResult GetTags()
@@ -70,5 +70,4 @@ public class ProductController : ControllerBase
             return Problem(title: ex.Message, detail: ex.StackTrace);
         }
     }
-
 }

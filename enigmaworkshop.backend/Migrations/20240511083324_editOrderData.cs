@@ -10,19 +10,13 @@ namespace enigmaworkshop.backend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Breakdown",
-                table: "Orders",
-                newName: "Data");
+            migrationBuilder.RenameColumn(name: "Breakdown", table: "Orders", newName: "Data");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Data",
-                table: "Orders",
-                newName: "Breakdown");
+            migrationBuilder.RenameColumn(name: "Data", table: "Orders", newName: "Breakdown");
         }
     }
 }

@@ -15,6 +15,8 @@ public partial class User
     [NTJson.JsonIgnore]
     public string Password { get; set; } = null!;
 
+    public string? Avatar { get; set; }
+
     public int? Status { get; set; }
 
     public int? Role { get; set; }

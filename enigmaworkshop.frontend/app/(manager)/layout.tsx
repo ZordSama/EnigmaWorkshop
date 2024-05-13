@@ -6,6 +6,7 @@ import "@/styles/globals.css";
 import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: {
@@ -38,6 +39,7 @@ export default function ManagerLayout({
             <main className="grow pt-16">{children}</main>
           </div>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
