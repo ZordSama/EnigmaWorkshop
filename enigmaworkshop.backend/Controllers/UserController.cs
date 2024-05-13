@@ -1,6 +1,7 @@
 using enigmaworkshop.backend.Authorization;
 using enigmaworkshop.backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace enigmaworkshop.backend.Controllers
 {
@@ -33,14 +34,64 @@ namespace enigmaworkshop.backend.Controllers
         }
 
         [HttpPost("create")]
-        public IActionResult createUser(CreateUserDTO dto)
+        [Authorize]
+        public IActionResult CreateUser(CreateUserDTO dto)
         {
-            
+            User? user = HttpContext.Items["User"] as User;
+            if (user != null && user.Role > 0) return Unauthorized("You are not allowed to access this resource.");
+            try
+            {
+                User newUser = new User
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Username = dto.User.Username!,
+                    Password = BCrypt.Net.BCrypt.HashPassword(dto.User.Password!),
+                    Role = dto.User.Role ?? 3,
+                    Status = dto.User.Status ?? 0
+                };
+                Customer? newCustomer = null;
+                if (dto.Customer != null)
+                    newCustomer = new Customer
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        User = newUser.Id,
+                        FirstName = dto.Customer.FirstName!,
+                        LastName = dto.Customer.LastName!,
+                        Gender = dto.Customer.Gender!,
+                        DoB = DateOnly.FromDateTime(dto.Customer.DoB ?? DateTime.Now),
+                        Email = dto.Customer.Email!,
+                        Phone = dto.Customer.Phone!,
+                        Address = JsonConvert.SerializeObject(dto.Customer.Address) ?? "",
+                    };
+                Employee? newEmployee = null;
+                if (dto.Employee != null)
+                    newEmployee = new Employee
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        User = newUser.Id,
+                        FirstName = dto.Employee.FirstName!,
+                        LastName = dto.Employee.LastName!,
+                        Gender = dto.Employee.Gender!,
+                        DoB = DateOnly.FromDateTime(dto.Employee.DoB),
+                        Email = dto.Employee.Email!,
+                        Phone = dto.Employee.Phone!,
+                        Address = JsonConvert.SerializeObject(dto.Employee.Address) ?? "",
+                        OptIn = DateOnly.FromDateTime(dto.Employee.OptIn ?? DateTime.Now),
+                    };
+                _db.Users.Add(newUser);
+                if (newCustomer != null) _db.Customers.Add(newCustomer);
+                else _db.Employees.Add(newEmployee!);
+                _db.SaveChanges();
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { title = ex.Message, detail = ex.StackTrace });
+            }
             return Ok();
         }
         [HttpPut("update")]
         [Authorize]
-        public IActionResult updateUser(UserDTO dto)
+        public IActionResult UpdateUser(UserDTO dto)
         {
             User? user = HttpContext.Items["User"] as User;
             if (user != null && (user.Role > 0 || user.Id != dto.Id))

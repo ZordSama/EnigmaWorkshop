@@ -17,7 +17,7 @@ namespace enigmaworkshop.backend.Controllers
         public IActionResult GetEmployees()
         {
             User? user = HttpContext.Items["User"] as User;
-            if (user == null || user.Role > 1)
+            if (user != null && user.Role > 1)
                 return Unauthorized(new { message = "Bạn không đủ quyền" });
             return Ok(_db.Employees.ToList());
         }

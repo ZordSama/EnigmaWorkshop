@@ -60,8 +60,8 @@ namespace enigmaworkshop.backend.Controllers
                     User = user.Id,
                     FirstName = dto.customer.FirstName,
                     LastName = dto.customer.LastName,
-                    Address = JsonConvert.SerializeObject(dto.customer.Address),
-                    DoB = DateOnly.FromDateTime(dto.customer.DoB),
+                    Address = JsonConvert.SerializeObject(dto.customer.Address) ?? "",
+                    DoB = DateOnly.FromDateTime(dto.customer.DoB ?? DateTime.Now),
                     Email = dto.customer.Email,
                     Phone = dto.customer.Phone,
                     Gender = dto.customer.Gender
