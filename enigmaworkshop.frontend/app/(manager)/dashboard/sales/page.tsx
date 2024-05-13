@@ -404,7 +404,7 @@ export default function SalesPage() {
         >
           <div className="flex h-full w-full flex-row">
             <div className="h-full w-1/2">
-              <DataTable columns={orderColumns} data={dummyData} />
+              <DataTable columns={orderColumns} data={dummyData} meta={{}} />
             </div>
             <div></div>
           </div>

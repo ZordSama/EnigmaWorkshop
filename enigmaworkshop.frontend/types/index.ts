@@ -31,19 +31,19 @@ export type Customer = Person & {
 };
 
 export type Employee = Person & {
-  optIn:Date;
-  optOut:Date;
-}
+  optIn: Date;
+  optOut: Date;
+};
 
-type User = {
+export type User = {
   id: string;
   username: string;
   password?: string;
   role: number;
   status: number;
-}
+};
 
-export type Produtct ={
+export type Produtct = {
   id: string;
   name: string;
   des: string;
@@ -51,4 +51,9 @@ export type Produtct ={
   stock: number;
   category: string;
   data?: {};
-}
+};
+
+export type Category = {
+  id: string;
+  name: string;
+};

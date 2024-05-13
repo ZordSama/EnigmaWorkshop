@@ -5,18 +5,23 @@
 namespace enigmaworkshop.backend.Migrations
 {
     /// <inheritdoc />
-    public partial class editOrderData : Migration
+    public partial class editUserTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(name: "Breakdown", table: "Orders", newName: "Data");
+            migrationBuilder.AddColumn<string>(
+                name: "Avatar",
+                table: "User",
+                type: "nvarchar(max)",
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(name: "Data", table: "Orders", newName: "Breakdown");
+            migrationBuilder.DropColumn(name: "Avatar", table: "User");
         }
     }
 }

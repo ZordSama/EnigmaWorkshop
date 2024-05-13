@@ -8,3 +8,9 @@ thead {
   position: sticky;
   top: 0;
 }
+
+td:last-child{
+  align-items: end;
+  text-align: right;
+  /* place-content: var(); */
+}

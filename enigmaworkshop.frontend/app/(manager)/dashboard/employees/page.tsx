@@ -1,6 +1,7 @@
 "use client";
 import { DataTable } from "@/components/datatable/data-table";
 import { DataTableColumnHeader } from "@/components/datatable/table-header";
+import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { Employee } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
@@ -12,15 +13,15 @@ export default function EmployeesPage() {
 
   async function getEmployees() {
     const resp = await axios.get<Employee[]>(
-      siteConfig.api + "Employee/getEmployees",
+      siteConfig.api + "Employee/getAll",
       {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       },
     );
     if (resp.status === 200) setEmployees(resp.data);
     else setEmployees([]);
   }
-  
+
   useEffect(() => {
     getEmployees();
   }, []);
@@ -53,6 +54,17 @@ export default function EmployeesPage() {
         title: "Tên",
       },
     },
+    // {
+    //   id: "fullName",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Tên" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <span>
+    //       {row.original.firstName} {row.original.lastName}
+    //     </span>
+    //   ),
+    // },
     {
       accessorKey: "doB",
       header: ({ column }) => (
@@ -62,7 +74,7 @@ export default function EmployeesPage() {
         title: "Ngày sinh",
       },
       cell: ({ row }) => (
-        <div>{new Date(row.original.doB).toLocaleDateString()}</div>
+        <div>{new Date(row.original.doB).toLocaleDateString("vi")}</div>
       ),
     },
     {
@@ -85,7 +97,7 @@ export default function EmployeesPage() {
       cell: ({ row }) => (
         <>
           {row.original.optIn !== null ? (
-            <div>{new Date(row.original.optIn).toLocaleDateString()}</div>
+            <div>{new Date(row.original.optIn).toLocaleDateString("vi")}</div>
           ) : (
             ""
           )}
@@ -103,19 +115,28 @@ export default function EmployeesPage() {
       cell: ({ row }) => (
         <>
           {row.original.optOut !== null ? (
-            <div>{new Date(row.original.optOut).toLocaleDateString()}</div>
+            <div>{new Date(row.original.optOut).toLocaleDateString("vi")}</div>
           ) : (
             "Chưa thôi việc"
           )}
         </>
       ),
     },
+    {
+      id: "Actions",
+      enableHiding: false,
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <Button variant={"outline"} size={"icon"}></Button>
+        </div>
+      )
+    }
   ];
   return (
     <div className="flex h-full w-full flex-col">
       <div className="text-xl font-bold">Quản lý nhân viên</div>
       <hr className="my-1" />
-      <DataTable columns={employeeColumn} data={employees} />
+      <DataTable columns={employeeColumn} data={employees} meta={{api: siteConfig.api+"Employee"}}/>
     </div>
   );
 }

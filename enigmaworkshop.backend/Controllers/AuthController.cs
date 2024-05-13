@@ -54,18 +54,8 @@ namespace enigmaworkshop.backend.Controllers
                     Password = BCrypt.Net.BCrypt.HashPassword(dto.user.Password)
                 };
                 _db.Users.Add(user);
-                Customer customer = new Customer
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    User = user.Id,
-                    FirstName = dto.customer.FirstName,
-                    LastName = dto.customer.LastName,
-                    Address = JsonConvert.SerializeObject(dto.customer.Address),
-                    DoB = DateOnly.FromDateTime(dto.customer.DoB),
-                    Email = dto.customer.Email,
-                    Phone = dto.customer.Phone,
-                    Gender = dto.customer.Gender
-                };
+                Customer customer = Mapper.Customer(dto.customer, user);
+
                 _db.Customers.Add(customer);
                 _db.SaveChanges();
                 return Ok("User registered successfully.");
@@ -94,7 +84,7 @@ namespace enigmaworkshop.backend.Controllers
         [Authorize]
         public IActionResult Me()
         {
-            return Ok(new{user = HttpContext.Items["User"]});
+            return Ok(new { user = HttpContext.Items["User"] });
         }
         // [HttpGet("refresh")]
         // [Authorize]

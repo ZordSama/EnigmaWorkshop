@@ -9,18 +9,17 @@ namespace enigmaworkshop.backend.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly EnigmaWorkshopContext _db;
+
         public EmployeeController(EnigmaWorkshopContext db) => _db = db;
 
-        [HttpGet("getEmployees")]
+        [HttpGet("getAll")]
         [Authorize]
         public IActionResult GetEmployees()
         {
             User? user = HttpContext.Items["User"] as User;
-            if (user == null || user.Role > 1) return Unauthorized(
-                new { message = "Bạn không đủ quyền" }
-            );
+            if (user != null && user.Role > 1)
+                return Unauthorized(new { message = "Bạn không đủ quyền" });
             return Ok(_db.Employees.ToList());
         }
-
     }
 }

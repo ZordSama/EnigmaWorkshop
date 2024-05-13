@@ -83,7 +83,7 @@ export default function OrdersPage() {
     <div className="flex h-full w-full flex-col">
       <div className="text-xl font-bold">Đơn đặt hàng</div>
       <hr className="my-1" />
-      <DataTable columns={orderColumns} data={dummyData} />
+      <DataTable columns={orderColumns} data={dummyData} meta={{}}/>
     </div>
   );
 }

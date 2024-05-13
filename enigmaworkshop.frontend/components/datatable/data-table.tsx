@@ -10,6 +10,7 @@ import {
   getSortedRowModel,
   RowData,
   SortingState,
+  TableMeta,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
@@ -35,24 +36,33 @@ import {
 import { Button } from "../ui/button";
 import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { hasLeastOneKey } from "@/lib/utils";
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+import axios from "axios";
+declare module "@tanstack/table-core" {
+  interface TableMeta<TData extends RowData> {
+    api?: string;
+  }
 }
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
     title: string;
+    // api?: string;
   }
+}
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  meta: TableMeta<TData>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  meta,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -66,17 +76,27 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
 
+    onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
 
     state: {
       sorting,
       columnVisibility,
       columnFilters,
+      rowSelection,
     },
   });
 
   const DeleteBtn = () => {
     if (data.length > 0) if (!hasLeastOneKey(data[0], ["category"])) return "";
+    function delClicked() {
+      const selectedRows = table.getFilteredSelectedRowModel().rows;
+      if (selectedRows.length > 0) {
+        selectedRows.map(async (row)=>{
+          const resp = await axios.delete(`${meta.api}/delete/${row.getValue('id')}`)
+        })
+      }
+    }
     return (
       <Button variant={"destructive"}>
         <TrashIcon /> <span className="ms-1">Xóa</span>
