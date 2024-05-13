@@ -13,7 +13,7 @@ export default function EmployeesPage() {
 
   async function getEmployees() {
     const resp = await axios.get<Employee[]>(
-      siteConfig.api + "Employee/getEmployees",
+      siteConfig.api + "Employee/getAll",
       {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       },
@@ -136,7 +136,7 @@ export default function EmployeesPage() {
     <div className="flex h-full w-full flex-col">
       <div className="text-xl font-bold">Quản lý nhân viên</div>
       <hr className="my-1" />
-      <DataTable columns={employeeColumn} data={employees} />
+      <DataTable columns={employeeColumn} data={employees} meta={{api: siteConfig.api+"Employee"}}/>
     </div>
   );
 }

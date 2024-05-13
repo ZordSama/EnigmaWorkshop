@@ -12,7 +12,7 @@ namespace enigmaworkshop.backend.Controllers
 
         public EmployeeController(EnigmaWorkshopContext db) => _db = db;
 
-        [HttpGet("getEmployees")]
+        [HttpGet("getAll")]
         [Authorize]
         public IActionResult GetEmployees()
         {

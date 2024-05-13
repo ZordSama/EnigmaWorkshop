@@ -14,15 +14,14 @@ namespace enigmaworkshop.backend.Migrations
                 name: "Avatar",
                 table: "User",
                 type: "nvarchar(max)",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Avatar",
-                table: "User");
+            migrationBuilder.DropColumn(name: "Avatar", table: "User");
         }
     }
 }

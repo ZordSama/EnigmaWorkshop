@@ -35,7 +35,8 @@ export default function InventoryPage() {
 
   const InventoryColumns: ColumnDef<Produtct>[] = [
     {
-      id: "select",
+      accessorKey: "id",
+      // id: "select",
       header: ({ table }) => (
         <Checkbox
           checked={
@@ -139,7 +140,11 @@ export default function InventoryPage() {
     <div className="flex h-full w-full flex-col">
       <div className="text-xl font-bold">Quản lý kho hàng</div>
       <hr className="my-1" />
-      <DataTable columns={InventoryColumns} data={products} />
+      <DataTable
+        columns={InventoryColumns}
+        data={products}
+        meta={{ api: siteConfig + "Product" }}
+      />
     </div>
   );
 }

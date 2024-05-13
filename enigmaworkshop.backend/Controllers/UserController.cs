@@ -38,7 +38,8 @@ namespace enigmaworkshop.backend.Controllers
         public IActionResult CreateUser(CreateUserDTO dto)
         {
             User? user = HttpContext.Items["User"] as User;
-            if (user != null && user.Role > 0) return Unauthorized("You are not allowed to access this resource.");
+            if (user != null && user.Role > 0)
+                return Unauthorized("You are not allowed to access this resource.");
             try
             {
                 User newUser = new User
@@ -49,38 +50,20 @@ namespace enigmaworkshop.backend.Controllers
                     Role = dto.User.Role ?? 3,
                     Status = dto.User.Status ?? 0
                 };
+
                 Customer? newCustomer = null;
                 if (dto.Customer != null)
-                    newCustomer = new Customer
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        User = newUser.Id,
-                        FirstName = dto.Customer.FirstName!,
-                        LastName = dto.Customer.LastName!,
-                        Gender = dto.Customer.Gender!,
-                        DoB = DateOnly.FromDateTime(dto.Customer.DoB ?? DateTime.Now),
-                        Email = dto.Customer.Email!,
-                        Phone = dto.Customer.Phone!,
-                        Address = JsonConvert.SerializeObject(dto.Customer.Address) ?? "",
-                    };
+                    newCustomer = Mapper.Customer(dto.Customer, newUser);
+
                 Employee? newEmployee = null;
                 if (dto.Employee != null)
-                    newEmployee = new Employee
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        User = newUser.Id,
-                        FirstName = dto.Employee.FirstName!,
-                        LastName = dto.Employee.LastName!,
-                        Gender = dto.Employee.Gender!,
-                        DoB = DateOnly.FromDateTime(dto.Employee.DoB),
-                        Email = dto.Employee.Email!,
-                        Phone = dto.Employee.Phone!,
-                        Address = JsonConvert.SerializeObject(dto.Employee.Address) ?? "",
-                        OptIn = DateOnly.FromDateTime(dto.Employee.OptIn ?? DateTime.Now),
-                    };
+                    newEmployee = Mapper.Employee(dto.Employee, newUser);
+
                 _db.Users.Add(newUser);
-                if (newCustomer != null) _db.Customers.Add(newCustomer);
-                else _db.Employees.Add(newEmployee!);
+                if (newCustomer != null)
+                    _db.Customers.Add(newCustomer);
+                else
+                    _db.Employees.Add(newEmployee!);
                 _db.SaveChanges();
             }
             catch (System.Exception ex)
@@ -89,6 +72,7 @@ namespace enigmaworkshop.backend.Controllers
             }
             return Ok();
         }
+
         [HttpPut("update")]
         [Authorize]
         public IActionResult UpdateUser(UserDTO dto)
