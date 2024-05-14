@@ -8,7 +8,6 @@ import { DataTable } from "@/components/datatable/data-table";
 import axios from "axios";
 import { siteConfig } from "@/config/site";
 import { CopyIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
-import { useToast } from "@/components/ui/use-toast";
 import {
   Modal,
   ModalContent,
@@ -20,9 +19,9 @@ import {
 } from "@nextui-org/react";
 import { OctagonAlert } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 export default function InventoryPage() {
-  const { toast } = useToast();
   const [modalBody, setModalBody] = useState<React.ReactNode>(null);
   const [modalTitle, setModalTitle] = useState("");
 
@@ -49,17 +48,51 @@ export default function InventoryPage() {
     return (
       <>
         <div className="flex w-full flex-col items-center justify-center text-center">
-          <div className="text-lg">
-            Đang chọn xóa sản phẩm: {row.original.name}
-          </div>
           <Separator />
-          <div className="flex w-full flex-col items-center justify-center text-red-600">
+          <div className="mb-1 flex w-full flex-col items-center justify-center text-red-600">
+            <span>Mã sản phẩm: {row.original.id}</span>
             <OctagonAlert size={36} />
-            Đây là hành động không thể hoàn tác, chắc chắn xóa?
+            <span>Đây là hành động không thể hoàn tác, chắc chắn xóa?</span>
           </div>
           <Separator />
-          <div className="flex w-full flex-row justify-center gap-3">
-            <Button onClick={onClose}>Huỷ</Button>
+          <div className="mt-2 flex w-full flex-row justify-center gap-3">
+            <Button
+              color="danger"
+              onClick={() => {
+                axios
+                  .delete(
+                    siteConfig.api + "Product/delete/" + row.original.id,
+                    {
+                      headers: {
+                        Authorization:
+                          "Bearer " + localStorage.getItem("token"),
+                      },
+                    },
+                  )
+                  .then((resp) => {
+                    if (resp.status === 200) {
+                      toast("", { description: "Xóa thành công!" });
+                      getProducts();
+                      onClose();
+                    }
+                  })
+                  .catch((error) => {
+                    if (error.response.status === 404)
+                      toast("Lỗi 404", {
+                        description: "Không tìm thấy sản phẩm!",
+                      });
+                    else
+                      toast("lỗi không xác định", {
+                        description: error.response.data.toString(),
+                      });
+                  });
+              }}
+            >
+              Xác nhận
+            </Button>
+            <Button color="success" onClick={onClose}>
+              Huỷ
+            </Button>
           </div>
         </div>
       </>
@@ -80,8 +113,7 @@ export default function InventoryPage() {
             className="cursor-pointer opacity-0 group-hover:opacity-100"
             onClick={() => {
               navigator.clipboard.writeText(row.getValue("id"));
-              toast({
-                title: "Đã copy vào clipboard!",
+              toast("Đã copy vào cliboard", {
                 description: row.getValue("id"),
               });
             }}

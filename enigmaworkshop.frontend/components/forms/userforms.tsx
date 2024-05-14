@@ -2,18 +2,19 @@
 import { siteConfig } from "@/config/site";
 import { Person, User, UserFieldValid } from "@/types";
 import { Input } from "@nextui-org/input";
-import {
-  Button,
-  Checkbox,
-  Select,
-  SelectItem,
-} from "@nextui-org/react";
+import { Button, Checkbox, Select, SelectItem } from "@nextui-org/react";
 import axios from "axios";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "../ui/separator";
 
-export function UpdateUser({ user }: { user?: User }) {
+export function UpdateUser({
+  user,
+  onClose,
+}: {
+  user?: User;
+  onClose: () => void;
+}) {
   const [userData, setUserData] = useState({ ...user });
   const [userFieldsValid, setUserFieldsValid] = useState<UserFieldValid>({
     username: true,
@@ -44,7 +45,8 @@ export function UpdateUser({ user }: { user?: User }) {
         .then((response) => {
           if (response.status === 200) {
             toast.success("Thành công", response.data);
-            setInterval(() => window.location.reload(), 1000);
+            onClose();
+            // setInterval(() => window.location.reload(), 1000);
           }
         })
         .catch((error) => {
@@ -138,7 +140,7 @@ export function UpdateUser({ user }: { user?: User }) {
   );
 }
 
-export function CreateUserForm() {
+export function CreateUserForm({ onClose }: { onClose: () => void }) {
   const [userData, setUserData] = useState<User>({} as User);
   const [personData, setPersonData] = useState<Person>({} as Person);
   const [isCustomer, setIsCustomer] = useState(true);
@@ -167,6 +169,7 @@ export function CreateUserForm() {
         })
         .then((response) => {
           if (response.status === 200) toast.success("Thành công!");
+          onClose();
         })
         .catch((error) => {
           toast.error("Thất bại!", { description: error.response.data });

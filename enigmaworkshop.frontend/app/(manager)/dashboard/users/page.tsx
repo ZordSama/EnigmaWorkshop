@@ -6,8 +6,6 @@ import { siteConfig } from "@/config/site";
 import {
   roleChip,
   ChipColours,
-  Customer,
-  Employee,
   roles,
   User,
   accStatusChip,
@@ -15,7 +13,7 @@ import {
 } from "@/types";
 import { Button } from "@nextui-org/button";
 import { CopyIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -28,24 +26,21 @@ import {
   ModalBody,
   useDisclosure,
 } from "@nextui-org/react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
 import { CreateUserForm, UpdateUser } from "@/components/forms/userforms";
+import { Separator } from "@/components/ui/separator";
+import { OctagonAlert } from "lucide-react";
 
 export default function UsersPage() {
+  const [modalBody, setModalBody] = useState<React.ReactNode>(null);
+  const [modalTitle, setModalTitle] = useState("");
+
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User>();
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [isUpdate, setIsUpdate] = useState(false);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  // const [employees, setEmployees] = useState<Employee[]>([]);
+  // const [customers, setCustomers] = useState<Customer[]>([]);
+
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   async function getUsers() {
     await axios
@@ -63,26 +58,83 @@ export default function UsersPage() {
         });
       });
   }
-  async function getEmployees() {
-    await axios
-      .get<Employee>(siteConfig.api + "Employee/getAll", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((response) => {});
-  }
-  async function getCustomers() {
-    const resp = await axios.get(siteConfig.api + "Customer/getAll", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-  }
+  
+  const handleClose = () => {
+    getUsers();
+    onClose();
+  };
+  // async function getEmployees() {
+  //   await axios
+  //     .get<Employee>(siteConfig.api + "Employee/getAll", {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //       },
+  //     })
+  //     .then((response) => {});
+  // }
+  // async function getCustomers() {
+  //   const resp = await axios.get(siteConfig.api + "Customer/getAll", {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //     },
+  //   });
+  // }
 
   useEffect(() => {
     getUsers();
   }, []);
+
+  const DelConfirm = (row: Row<User>) => {
+    return (
+      <>
+        <div className="flex w-full flex-col items-center justify-center text-center">
+          <Separator />
+          <div className="mb-1 flex w-full flex-col items-center justify-center text-red-600">
+            <span>Tên người dùng: {row.original.username}</span>
+            <OctagonAlert size={36} />
+            <span>Đây là hành động không thể hoàn tác, chắc chắn xóa?</span>
+          </div>
+          <Separator />
+          <div className="mt-2 flex w-full flex-row justify-center gap-3">
+            <Button
+              color="danger"
+              onClick={() => {
+                axios
+                  .delete(siteConfig.api + "User/delete/" + row.original.id, {
+                    headers: {
+                      Authorization: "Bearer " + localStorage.getItem("token"),
+                    },
+                  })
+                  .then((resp) => {
+                    if (resp.status === 200) {
+                      toast("", { description: "Xóa thành công!" });
+                      getUsers();
+                      onClose();
+                    }
+                  })
+                  .catch((error) => {
+                    if (error.response.status === 404)
+                      toast("Lỗi 404", {
+                        description: "Không tìm thấy sản phẩm!",
+                      });
+                    else
+                      toast("lỗi không xác định", {
+                        description: error.response.data.toString(),
+                      });
+                  });
+              }}
+            >
+              Xác nhận
+            </Button>
+            <Button color="success" onClick={onClose}>
+              Huỷ
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   const userColumns: ColumnDef<User>[] = [
     {
       accessorKey: "id",
@@ -157,16 +209,19 @@ export default function UsersPage() {
     {
       id: "actions",
       cell: ({ row }) => {
-        function handleOpen() {
-          setEditingUser(row.original as User);
-          setIsUpdate(true);
-          onOpen();
-        }
         return (
           <div className="me-0 ms-auto flex w-fit gap-2">
             <Tooltip content="Chỉnh sửa" className="w-fit">
               <Button
-                onClick={() => handleOpen()}
+                onClick={() => {
+                  setModalTitle(
+                    `Chỉnh sửa người dùng ${row.original.username}`,
+                  );
+                  setModalBody(
+                    <UpdateUser user={row.original} onClose={handleClose} />,
+                  );
+                  onOpen();
+                }}
                 variant="ghost"
                 color="default"
               >
@@ -174,7 +229,14 @@ export default function UsersPage() {
               </Button>
             </Tooltip>
             <Tooltip content="Xóa" className="w-fit">
-              <Button variant="ghost" color="danger">
+              <Button
+                variant="ghost"
+                color="danger"
+                onClick={() => {
+                  setModalTitle(`Xóa người dùng ${row.original.username}`);
+                  setModalBody(DelConfirm(row));
+                }}
+              >
                 <TrashIcon />
               </Button>
             </Tooltip>
@@ -184,6 +246,7 @@ export default function UsersPage() {
     },
   ];
 
+
   return (
     <>
       <div className="flex h-full w-full flex-col gap-2">
@@ -191,7 +254,8 @@ export default function UsersPage() {
           <div className="text-xl font-bold">Quản lý người dùng</div>
           <Button
             onClick={() => {
-              setIsUpdate(false);
+              setModalTitle("Thêm người dùng mới");
+              setModalBody(<CreateUserForm onClose={handleClose}/>);
               onOpen();
             }}
           >
@@ -201,22 +265,23 @@ export default function UsersPage() {
         <hr className="my-1" />
         <DataTable columns={userColumns} data={users.toReversed()} />
       </div>
-      <Modal size="2xl" isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        size="2xl"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onClose={handleClose}
+      >
         <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Cập nhật người dùng {editingUser?.username}
-              </ModalHeader>
-              <ModalBody>
-                {isUpdate ? (
-                  <UpdateUser user={editingUser!} />
-                ) : (
-                  <CreateUserForm />
-                )}
-              </ModalBody>
-            </>
-          )}
+          {(onClose) => {
+            return (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  {modalTitle}
+                </ModalHeader>
+                <ModalBody>{modalBody}</ModalBody>
+              </>
+            );
+          }}
         </ModalContent>
       </Modal>
     </>
