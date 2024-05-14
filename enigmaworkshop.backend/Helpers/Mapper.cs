@@ -35,5 +35,10 @@ public class Mapper
             OptIn = DateOnly.FromDateTime(dto.OptIn ?? DateTime.Now),
         };
     }
-    // public static User User(UserDTO)
+    // public static Product Product(ProductDTO dto){
+
+    //     return new Product {
+    //         Id = dto.Id
+    //     };
+    // }
 }

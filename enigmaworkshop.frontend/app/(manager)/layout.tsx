@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sooner } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -40,6 +41,7 @@ export default function ManagerLayout({
           </div>
         </ThemeProvider>
         <Toaster />
+        <Sooner />
       </body>
     </html>
   );

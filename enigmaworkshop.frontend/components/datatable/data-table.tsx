@@ -10,7 +10,6 @@ import {
   getSortedRowModel,
   RowData,
   SortingState,
-  TableMeta,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { ScrollArea } from "../ui/scroll-area";
 import { DataTablePagination } from "./pagination";
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "../ui/input";
 import {
   DropdownMenu,
@@ -34,14 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
-import { hasLeastOneKey } from "@/lib/utils";
-import axios from "axios";
-declare module "@tanstack/table-core" {
-  interface TableMeta<TData extends RowData> {
-    api?: string;
-  }
-}
+
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
     title: string;
@@ -51,13 +43,11 @@ declare module "@tanstack/react-table" {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  meta: TableMeta<TData>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  meta,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -66,6 +56,10 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+  useEffect(() => {
+    localStorage.removeItem("rowSelections");
+  }, []);
+  
   const table = useReactTable({
     data,
     columns,
@@ -86,30 +80,9 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   });
-
-  const DeleteBtn = () => {
-    if (data.length > 0) if (!hasLeastOneKey(data[0], ["category"])) return "";
-    function delClicked() {
-      const selectedRows = table.getFilteredSelectedRowModel().rows;
-      if (selectedRows.length > 0) {
-        selectedRows.map(async (row)=>{
-          const resp = await axios.delete(`${meta.api}/delete/${row.getValue('id')}`)
-        })
-      }
-    }
-    return (
-      <Button variant={"destructive"}>
-        <TrashIcon /> <span className="ms-1">Xóa</span>
-      </Button>
-    );
-  };
   return (
     <div>
       <div className="flex items-center gap-2 py-4">
-        <Button>
-          <PlusIcon /> <span className="ms-1">Thêm mới</span>
-        </Button>
-        <DeleteBtn />
         <Input
           placeholder="Lọc "
           value={table.getColumn("id")?.getFilterValue() as string}
