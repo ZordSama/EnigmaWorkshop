@@ -2,6 +2,7 @@
 import { DataTable } from "@/components/datatable/data-table";
 import { DataTableColumnHeader } from "@/components/datatable/table-header";
 import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/config/site";
 import { Order } from "@/types";
 import { Action } from "@radix-ui/react-toast";
 import { ColumnDef } from "@tanstack/react-table";
@@ -83,7 +84,7 @@ export default function OrdersPage() {
     <div className="flex h-full w-full flex-col">
       <div className="text-xl font-bold">Đơn đặt hàng</div>
       <hr className="my-1" />
-      <DataTable columns={orderColumns} data={dummyData} meta={{}}/>
+      <DataTable columns={orderColumns} data={dummyData} />
     </div>
   );
 }

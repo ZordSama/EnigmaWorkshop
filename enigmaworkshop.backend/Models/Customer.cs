@@ -29,6 +29,11 @@ public partial class Customer
 
     public string? User { get; set; }
 
+    
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

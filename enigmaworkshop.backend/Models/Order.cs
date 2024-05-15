@@ -21,6 +21,10 @@ public partial class Order
 
     public string? Data { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
     public virtual Customer CustomerNavigation { get; set; } = null!;

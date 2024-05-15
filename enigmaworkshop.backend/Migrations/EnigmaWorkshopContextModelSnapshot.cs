@@ -50,9 +50,15 @@ namespace enigmaworkshop.backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasName("PK__Categori__3214EC07FBA51219");
@@ -69,6 +75,9 @@ namespace enigmaworkshop.backend.Migrations
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateOnly>("DoB")
                         .HasColumnType("date");
@@ -102,6 +111,9 @@ namespace enigmaworkshop.backend.Migrations
                     b.Property<int?>("Rank")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("User")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -128,6 +140,9 @@ namespace enigmaworkshop.backend.Migrations
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateOnly>("DoB")
                         .HasColumnType("date");
@@ -161,6 +176,9 @@ namespace enigmaworkshop.backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("User")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -193,6 +211,9 @@ namespace enigmaworkshop.backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Customer")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -206,6 +227,9 @@ namespace enigmaworkshop.backend.Migrations
 
                     b.Property<double?>("Total")
                         .HasColumnType("float");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasName("PK__Orders__3214EC0791CF69AF");
@@ -248,6 +272,9 @@ namespace enigmaworkshop.backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Data")
                         .HasColumnType("nvarchar(max)");
 
@@ -266,6 +293,9 @@ namespace enigmaworkshop.backend.Migrations
 
                     b.Property<int?>("Stock")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasName("PK__Products__3214EC0726D76773");
@@ -305,9 +335,15 @@ namespace enigmaworkshop.backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasName("PK__Tags__3214EC07C7C6AD6A");
@@ -326,6 +362,9 @@ namespace enigmaworkshop.backend.Migrations
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -340,6 +379,9 @@ namespace enigmaworkshop.backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Username")
                         .IsRequired()

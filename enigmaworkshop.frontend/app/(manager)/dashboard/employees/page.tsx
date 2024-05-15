@@ -136,7 +136,7 @@ export default function EmployeesPage() {
     <div className="flex h-full w-full flex-col">
       <div className="text-xl font-bold">Quản lý nhân viên</div>
       <hr className="my-1" />
-      <DataTable columns={employeeColumn} data={employees} meta={{api: siteConfig.api+"Employee"}}/>
+      <DataTable  columns={employeeColumn} data={employees}/>
     </div>
   );
 }

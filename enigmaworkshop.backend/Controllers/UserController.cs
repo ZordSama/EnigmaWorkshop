@@ -20,7 +20,7 @@ namespace enigmaworkshop.backend.Controllers
             User? user = HttpContext.Items["User"] as User;
             if (user != null && user.Role > 0)
                 return Unauthorized("You are not allowed to access this resource.");
-            return Ok(_db.Users.ToList());
+            return Ok(_db.Users.OrderBy(e => e.CreatedAt).ThenBy(e => e.UpdatedAt).ToList());
         }
 
         [HttpGet("get/{id}")]
@@ -48,7 +48,8 @@ namespace enigmaworkshop.backend.Controllers
                     Username = dto.User.Username!,
                     Password = BCrypt.Net.BCrypt.HashPassword(dto.User.Password!),
                     Role = dto.User.Role ?? 3,
-                    Status = dto.User.Status ?? 0
+                    Status = dto.User.Status ?? 0,
+                    CreatedAt = DateTime.Now,
                 };
 
                 Customer? newCustomer = null;
@@ -78,7 +79,7 @@ namespace enigmaworkshop.backend.Controllers
         public IActionResult UpdateUser(UserDTO dto)
         {
             User? user = HttpContext.Items["User"] as User;
-            if (user != null && (user.Role > 0 || user.Id != dto.Id))
+            if (user != null && user.Role > 0 && user.Id != dto.Id)
                 return Unauthorized("You are not allowed to access this resource.");
             try
             {
@@ -89,14 +90,17 @@ namespace enigmaworkshop.backend.Controllers
                 if (dto.Password != null && dto.Password.Length > 8)
                     password = BCrypt.Net.BCrypt.HashPassword(dto.Password);
                 dbUser.Password = password ?? dbUser.Password;
+                dbUser.Status = dto.Status ?? dbUser.Status;
+                dbUser.Role = dto.Role ?? dbUser.Role;
                 dbUser.Avatar = dto.Avatar ?? dbUser.Avatar;
+                dbUser.UpdatedAt = DateTime.Now;
                 _db.SaveChanges();
             }
             catch (Exception ex)
             {
                 return Problem(title: ex.Message, detail: ex.StackTrace);
             }
-            return Ok("User updated successfully.");
+            return Ok("Đã cập nhật thông tin người dùng " + dto.Username + " thành công!");
         }
 
         [HttpDelete("delete/{id}")]
@@ -104,7 +108,7 @@ namespace enigmaworkshop.backend.Controllers
         public IActionResult Delete(string id)
         {
             User? user = HttpContext.Items["User"] as User;
-            if (user != null && (user.Role > 0 || user.Id != id))
+            if (user != null && user.Role > 0 && user.Id != id)
                 return Unauthorized("You are not allowed to access this resource.");
             try
             {

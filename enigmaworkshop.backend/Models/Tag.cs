@@ -13,6 +13,10 @@ public partial class Tag
 
     public string Category { get; set; } = null!;
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
     public virtual Category CategoryNavigation { get; set; } = null!;

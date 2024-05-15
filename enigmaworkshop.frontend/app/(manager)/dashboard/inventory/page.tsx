@@ -1,22 +1,35 @@
 "use client";
 import { Category, Produtct } from "@/types";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/datatable/table-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/datatable/data-table";
 import axios from "axios";
 import { siteConfig } from "@/config/site";
-import { CopyIcon, InfoCircledIcon } from "@radix-ui/react-icons";
-import { useToast } from "@/components/ui/use-toast";
+import { CopyIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
+  Button,
+  Tooltip,
+} from "@nextui-org/react";
+import { OctagonAlert } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { CreateProductForm } from "@/components/forms/product";
 
 export default function InventoryPage() {
-  const { toast } = useToast();
+  const [modalBody, setModalBody] = useState<React.ReactNode>(null);
+  const [modalTitle, setModalTitle] = useState("");
 
   const [products, setProducts] = useState<Produtct[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   async function getProducts() {
     const resp = await axios.get<Produtct[]>(siteConfig.api + "Product/getAll");
@@ -32,31 +45,61 @@ export default function InventoryPage() {
     getProducts();
     getCategories();
   }, []);
-
+  const DelConfirm = (row: Row<Produtct>) => {
+    return (
+      <>
+        <div className="flex w-full flex-col items-center justify-center text-center">
+          <Separator />
+          <div className="mb-1 flex w-full flex-col items-center justify-center text-red-600">
+            <span>Mã sản phẩm: {row.original.id}</span>
+            <OctagonAlert size={36} />
+            <span>Đây là hành động không thể hoàn tác, chắc chắn xóa?</span>
+          </div>
+          <Separator />
+          <div className="mt-2 flex w-full flex-row justify-center gap-3">
+            <Button
+              color="danger"
+              onClick={() => {
+                axios
+                  .delete(
+                    siteConfig.api + "Product/delete/" + row.original.id,
+                    {
+                      headers: {
+                        Authorization:
+                          "Bearer " + localStorage.getItem("token"),
+                      },
+                    },
+                  )
+                  .then((resp) => {
+                    if (resp.status === 200) {
+                      toast("", { description: "Xóa thành công!" });
+                      getProducts();
+                      onClose();
+                    }
+                  })
+                  .catch((error) => {
+                    if (error.response.status === 404)
+                      toast("Lỗi 404", {
+                        description: "Không tìm thấy sản phẩm!",
+                      });
+                    else
+                      toast("lỗi không xác định", {
+                        description: error.response.data.toString(),
+                      });
+                  });
+              }}
+            >
+              Xác nhận
+            </Button>
+            <Button color="success" onClick={onClose}>
+              Huỷ
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  };
   const InventoryColumns: ColumnDef<Produtct>[] = [
-    {
-      accessorKey: "id",
-      // id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: "id",
       header: ({ column }) => (
@@ -71,7 +114,9 @@ export default function InventoryPage() {
             className="cursor-pointer opacity-0 group-hover:opacity-100"
             onClick={() => {
               navigator.clipboard.writeText(row.getValue("id"));
-              toast({ title: "Copied to clipboard!" });
+              toast("Đã copy vào cliboard", {
+                description: row.getValue("id"),
+              });
             }}
           />
         </div>
@@ -122,29 +167,63 @@ export default function InventoryPage() {
     {
       id: "actions",
       cell: ({ row }) => (
-        <div className="me-0 ms-auto grid h-12 w-36 grid-cols-3 gap-1">
-          <Button variant={"outline"} size={"icon"}>
-            <InfoCircledIcon />
-          </Button>
-          <Button variant={"outline"} size={"icon"}>
-            <InfoCircledIcon />
-          </Button>
-          <Button variant={"outline"} size={"icon"}>
-            <InfoCircledIcon />
-          </Button>
+        <div className="me-2 ms-auto flex h-12 w-36 flex-row gap-1">
+          <Tooltip content="Chỉnh sửa" className="w-fit">
+            <Button variant="ghost" color="default">
+              <Pencil1Icon />
+            </Button>
+          </Tooltip>
+          <Tooltip content="Xóa" className="w-fit">
+            <Button
+              variant="ghost"
+              color="danger"
+              onClick={() => {
+                setModalTitle("Bạn có chắc chắn muốn xóa?");
+                setModalBody(DelConfirm(row));
+                onOpen();
+              }}
+            >
+              <TrashIcon />
+            </Button>
+          </Tooltip>
         </div>
       ),
     },
   ];
+  const handleClose = () => {
+    getProducts();
+    onClose();
+  };
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="text-xl font-bold">Quản lý kho hàng</div>
-      <hr className="my-1" />
-      <DataTable
-        columns={InventoryColumns}
-        data={products}
-        meta={{ api: siteConfig + "Product" }}
-      />
-    </div>
+    <>
+      <div className="flex h-full w-full flex-col">
+        <div className="flex flex-row items-center justify-between">
+          <div className="text-xl font-bold">Quản lý kho hàng</div>
+          <Button
+            onClick={() => {
+              setModalTitle("Thêm sản phẩm mới");
+              setModalBody(<CreateProductForm onClose={handleClose} />);
+              onOpen();
+            }}
+          >
+            Thêm sản phẩm
+          </Button>
+        </div>
+        <hr className="my-1" />
+        <DataTable columns={InventoryColumns} data={products} />
+      </div>
+      <Modal size="2xl" isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col items-center gap-1 py-1 text-center">
+                {modalTitle}
+              </ModalHeader>
+              <ModalBody>{modalBody}</ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

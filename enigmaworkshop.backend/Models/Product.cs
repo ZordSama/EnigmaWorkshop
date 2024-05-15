@@ -22,6 +22,10 @@ public partial class Product
     public string? Images { get; set; }
 
     public string? Category { get; set; }
+    
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 
     [JsonIgnore]
     [NTJson.JsonIgnore]
