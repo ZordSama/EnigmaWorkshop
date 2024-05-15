@@ -11,6 +11,10 @@ public partial class Category
 
     public string? Name { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();

@@ -20,7 +20,7 @@ namespace enigmaworkshop.backend.Controllers
             User? user = HttpContext.Items["User"] as User;
             if (user != null && user.Role > 0)
                 return Unauthorized("You are not allowed to access this resource.");
-            return Ok(_db.Users.ToList());
+            return Ok(_db.Users.OrderBy(e => e.CreatedAt).ThenBy(e => e.UpdatedAt).ToList());
         }
 
         [HttpGet("get/{id}")]
@@ -48,7 +48,8 @@ namespace enigmaworkshop.backend.Controllers
                     Username = dto.User.Username!,
                     Password = BCrypt.Net.BCrypt.HashPassword(dto.User.Password!),
                     Role = dto.User.Role ?? 3,
-                    Status = dto.User.Status ?? 0
+                    Status = dto.User.Status ?? 0,
+                    CreatedAt = DateTime.Now,
                 };
 
                 Customer? newCustomer = null;
@@ -89,9 +90,10 @@ namespace enigmaworkshop.backend.Controllers
                 if (dto.Password != null && dto.Password.Length > 8)
                     password = BCrypt.Net.BCrypt.HashPassword(dto.Password);
                 dbUser.Password = password ?? dbUser.Password;
-                dbUser.Status = dto.Status?? dbUser.Status;
-                dbUser.Role = dto.Role?? dbUser.Role;
+                dbUser.Status = dto.Status ?? dbUser.Status;
+                dbUser.Role = dto.Role ?? dbUser.Role;
                 dbUser.Avatar = dto.Avatar ?? dbUser.Avatar;
+                dbUser.UpdatedAt = DateTime.Now;
                 _db.SaveChanges();
             }
             catch (Exception ex)

@@ -55,7 +55,7 @@ export type Produtct = {
   price: number;
   stock: number;
   category: string;
-  images: string;
+  images: string[];
   data?: {};
 };
 
@@ -77,6 +77,11 @@ export type ProductFieldValid = {
   price: boolean;
   stock: boolean;
   category: boolean;
+};
+
+export type ValidateObject = {
+  isValid: boolean;
+  message?: string;
 };
 
 export const roles = {

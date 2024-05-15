@@ -26,6 +26,7 @@ namespace enigmaworkshop.backend.Controllers
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
                 return Unauthorized("Tên đăng nhập hoặc mật khẩu không đúng.");
+            if (user.Status == 2) return Unauthorized("Tài khoản đã bị khóa.");
             var customer = _db.Customers.FirstOrDefault(c => c.User == user.Id);
             var employee = _db.Employees.FirstOrDefault(e => e.User == user.Id);
             return Ok(
@@ -51,7 +52,8 @@ namespace enigmaworkshop.backend.Controllers
                 {
                     Id = Guid.NewGuid().ToString(),
                     Username = dto.user.Username,
-                    Password = BCrypt.Net.BCrypt.HashPassword(dto.user.Password)
+                    Password = BCrypt.Net.BCrypt.HashPassword(dto.user.Password),
+                    CreatedAt = DateTime.Now
                 };
                 _db.Users.Add(user);
                 Customer customer = Mapper.Customer(dto.customer, user);

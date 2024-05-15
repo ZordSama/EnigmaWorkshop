@@ -16,6 +16,7 @@ public class Mapper
             Email = dto.Email!,
             Phone = dto.Phone!,
             Address = JsonConvert.SerializeObject(dto.Address) ?? "",
+            CreatedAt = DateTime.Now,
         };
     }
 
@@ -33,6 +34,7 @@ public class Mapper
             Phone = dto.Phone!,
             Address = JsonConvert.SerializeObject(dto.Address) ?? "",
             OptIn = DateOnly.FromDateTime(dto.OptIn ?? DateTime.Now),
+            CreatedAt = DateTime.Now,
         };
     }
     // public static Product Product(ProductDTO dto){

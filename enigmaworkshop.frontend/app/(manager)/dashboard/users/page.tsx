@@ -58,7 +58,7 @@ export default function UsersPage() {
         });
       });
   }
-  
+
   const handleClose = () => {
     getUsers();
     onClose();
@@ -235,6 +235,7 @@ export default function UsersPage() {
                 onClick={() => {
                   setModalTitle(`Xóa người dùng ${row.original.username}`);
                   setModalBody(DelConfirm(row));
+                  onOpen();
                 }}
               >
                 <TrashIcon />
@@ -246,7 +247,6 @@ export default function UsersPage() {
     },
   ];
 
-
   return (
     <>
       <div className="flex h-full w-full flex-col gap-2">
@@ -255,7 +255,7 @@ export default function UsersPage() {
           <Button
             onClick={() => {
               setModalTitle("Thêm người dùng mới");
-              setModalBody(<CreateUserForm onClose={handleClose}/>);
+              setModalBody(<CreateUserForm onClose={handleClose} />);
               onOpen();
             }}
           >

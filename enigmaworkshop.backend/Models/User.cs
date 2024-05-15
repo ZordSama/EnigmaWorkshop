@@ -21,6 +21,10 @@ public partial class User
 
     public int? Role { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
     public virtual Customer? Customer { get; set; }

@@ -22,7 +22,7 @@ public class ProductController : ControllerBase
     {
         try
         {
-            return Ok(_db.Products.ToList());
+            return Ok(_db.Products.OrderByDescending(e => e.CreatedAt).ToList());
         }
         catch (System.Exception ex)
         {
@@ -90,6 +90,7 @@ public class ProductController : ControllerBase
                 Images = JsonConvert.SerializeObject(dto.Images?.ToList()),
                 Data = JsonConvert.SerializeObject(dto.Data),
                 Category = dto.Category,
+                CreatedAt = DateTime.Now
             };
             _db.Products.Add(product);
             _db.SaveChanges();

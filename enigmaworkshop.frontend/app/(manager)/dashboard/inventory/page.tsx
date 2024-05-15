@@ -20,6 +20,7 @@ import {
 import { OctagonAlert } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { CreateProductForm } from "@/components/forms/product";
 
 export default function InventoryPage() {
   const [modalBody, setModalBody] = useState<React.ReactNode>(null);
@@ -189,10 +190,25 @@ export default function InventoryPage() {
       ),
     },
   ];
+  const handleClose = () => {
+    getProducts();
+    onClose();
+  };
   return (
     <>
       <div className="flex h-full w-full flex-col">
-        <div className="text-xl font-bold">Quản lý kho hàng</div>
+        <div className="flex flex-row items-center justify-between">
+          <div className="text-xl font-bold">Quản lý kho hàng</div>
+          <Button
+            onClick={() => {
+              setModalTitle("Thêm sản phẩm mới");
+              setModalBody(<CreateProductForm onClose={handleClose} />);
+              onOpen();
+            }}
+          >
+            Thêm sản phẩm
+          </Button>
+        </div>
         <hr className="my-1" />
         <DataTable columns={InventoryColumns} data={products} />
       </div>

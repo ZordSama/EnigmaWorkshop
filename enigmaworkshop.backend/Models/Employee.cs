@@ -29,6 +29,10 @@ public partial class Employee
 
     public string? User { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [JsonIgnore]
     [NTJson.JsonIgnore]
     public virtual User? UserNavigation { get; set; }
