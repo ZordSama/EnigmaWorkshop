@@ -263,7 +263,7 @@ export default function UsersPage() {
           </Button>
         </div>
         <hr className="my-1" />
-        <DataTable columns={userColumns} data={users.toReversed()} />
+        <DataTable columns={userColumns} data={users.reverse()} />
       </div>
       <Modal
         size="2xl"
